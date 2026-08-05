@@ -135,6 +135,29 @@
             .dpad button { width: 40px; height: 40px; font-size: 1rem; }
             .action-buttons button { width: 42px; height: 42px; font-size: 0.5rem; }
         }
+        @media (orientation: portrait) and (max-width: 768px) {
+            #gameContainer {
+                transform: rotate(90deg);
+                transform-origin: center center;
+                width: 100vh;
+                height: 100vw;
+                max-width: 100vh;
+                max-height: 100vw;
+            }
+            body {
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+            }
+        }
+        @media (orientation: landscape) and (max-width: 768px) {
+            #gameContainer {
+                width: 100vw;
+                height: 100vh;
+                max-width: 100vw;
+                max-height: 100vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -461,14 +484,65 @@
                 ctx.shadowBlur = 15;
                 ctx.shadowOffsetY = 5;
 
-                // Cuerpo
-                const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
-                grad.addColorStop(0, this.genero === 'hombre' ? '#1a237e' : '#4a148c');
-                grad.addColorStop(0.5, this.genero === 'hombre' ? '#283593' : '#6a1b9a');
-                grad.addColorStop(1, this.genero === 'hombre' ? '#1a237e' : '#4a148c');
-                ctx.fillStyle = grad;
-                ctx.shadowBlur = 10;
-                ctx.fillRect(x + 4, y + 8, 22, 30);
+                // Cuerpo - Diferenciación clara entre hombre y mujer
+                if (this.genero === 'hombre') {
+                    // Hombre - Cuerpo más cuadrado y ancho
+                    const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
+                    grad.addColorStop(0, '#1a237e');
+                    grad.addColorStop(0.5, '#283593');
+                    grad.addColorStop(1, '#1a237e');
+                    ctx.fillStyle = grad;
+                    ctx.shadowBlur = 10;
+                    ctx.fillRect(x + 3, y + 10, 24, 28);
+                    
+                    // Cinturón
+                    ctx.fillStyle = '#4a2c0a';
+                    ctx.fillRect(x + 3, y + 32, 24, 4);
+                    
+                    // Hombros más anchos
+                    ctx.fillStyle = '#1a237e';
+                    ctx.fillRect(x + 1, y + 12, 5, 8);
+                    ctx.fillRect(x + 24, y + 12, 5, 8);
+                } else {
+                    // Mujer - Cuerpo más estilizado y curvas
+                    // Vestido
+                    const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
+                    grad.addColorStop(0, '#4a148c');
+                    grad.addColorStop(0.5, '#6a1b9a');
+                    grad.addColorStop(1, '#4a148c');
+                    ctx.fillStyle = grad;
+                    ctx.shadowBlur = 10;
+                    // Cuerpo más delgado
+                    ctx.fillRect(x + 5, y + 10, 20, 22);
+                    
+                    // Vestido - forma de falda
+                    ctx.fillStyle = '#6a1b9a';
+                    ctx.beginPath();
+                    ctx.moveTo(x + 2, y + 32);
+                    ctx.lineTo(x + 28, y + 32);
+                    ctx.lineTo(x + 30, y + 40);
+                    ctx.lineTo(x + 0, y + 40);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Cintura más marcada
+                    ctx.fillStyle = '#4a148c';
+                    ctx.fillRect(x + 8, y + 28, 14, 3);
+                    
+                    // Pecho (sutil)
+                    ctx.fillStyle = '#7c4dff';
+                    ctx.beginPath();
+                    ctx.arc(x + 11, y + 16, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + 19, y + 16, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Hombros más estrechos
+                    ctx.fillStyle = '#4a148c';
+                    ctx.fillRect(x + 3, y + 12, 4, 6);
+                    ctx.fillRect(x + 23, y + 12, 4, 6);
+                }
 
                 ctx.shadowBlur = 0;
 
@@ -481,16 +555,47 @@
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // Pelo
-                ctx.fillStyle = this.genero === 'hombre' ? '#1a1a1a' : '#4a148c';
+                // Pelo - Diferenciación clara
                 if (this.genero === 'hombre') {
-                    ctx.fillRect(x + 6, y + 1, 18, 5);
-                    ctx.fillRect(x + 4, y + 3, 22, 3);
+                    // Pelo corto masculino
+                    ctx.fillStyle = '#1a1a1a';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2, y + 5, 13, 0, Math.PI);
+                    ctx.fill();
+                    ctx.fillRect(x + 4, y + 1, 22, 5);
+                    // Barba (opcional)
+                    ctx.fillStyle = 'rgba(30,30,30,0.3)';
+                    ctx.fillRect(x + 8, y + 16, 14, 4);
                 } else {
-                    for (let i = -1; i <= 1; i += 0.5) {
-                        ctx.fillRect(x + this.ancho / 2 + i * 10 - 2, y + 2, 4, 12 + Math.abs(i) * 5);
+                    // Pelo largo femenino
+                    ctx.fillStyle = '#8B4513';
+                    // Pelo largo cayendo
+                    for (let i = -2; i <= 2; i += 0.8) {
+                        ctx.beginPath();
+                        ctx.moveTo(x + this.ancho / 2 + i * 6, y + 4);
+                        ctx.quadraticCurveTo(
+                            x + this.ancho / 2 + i * 12 + (i > 0 ? 8 : -8),
+                            y + 20 + Math.abs(i) * 4,
+                            x + this.ancho / 2 + i * 14 + (i > 0 ? 12 : -12),
+                            y + 32 + Math.abs(i) * 6
+                        );
+                        ctx.lineWidth = 3 + Math.abs(i) * 1.5;
+                        ctx.stroke();
                     }
-                    ctx.fillRect(x + this.ancho / 2 + 12 * dir, y + 2, 6, 6);
+                    // Moño
+                    ctx.fillStyle = '#6B3410';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2 + 12 * dir, y + 2, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillRect(x + this.ancho / 2 + 10 * dir, y - 2, 4, 8);
+                    // Lazo
+                    ctx.fillStyle = '#FF6B9D';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2 + 14 * dir, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2 + 10 * dir, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
                 }
 
                 // Ojos
@@ -502,6 +607,24 @@
                 ctx.beginPath();
                 ctx.arc(ojoX + 4, y + 8, 3.5, 0, Math.PI * 2);
                 ctx.fill();
+                
+                // Pestañas (más largas para mujer)
+                ctx.strokeStyle = '#1a1a2e';
+                ctx.lineWidth = 1.5;
+                if (this.genero === 'mujer') {
+                    // Pestañas largas
+                    for (let i = -1; i <= 1; i+=0.5) {
+                        ctx.beginPath();
+                        ctx.moveTo(ojoX - 4 + i * 2, y + 6);
+                        ctx.lineTo(ojoX - 4 + i * 3, y + 3);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(ojoX + 4 + i * 2, y + 6);
+                        ctx.lineTo(ojoX + 4 + i * 3, y + 3);
+                        ctx.stroke();
+                    }
+                }
+                
                 ctx.fillStyle = '#1a1a2e';
                 ctx.beginPath();
                 ctx.arc(ojoX - 3 + (this.mirandoDerecha ? 1 : -1), y + 9, 2, 0, Math.PI * 2);
@@ -510,36 +633,78 @@
                 ctx.arc(ojoX + 5 + (this.mirandoDerecha ? 1 : -1), y + 9, 2, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Boca
+                // Boca - Diferente para hombre y mujer
                 ctx.strokeStyle = '#5D4037';
                 ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.arc(x + this.ancho / 2, y + 15, 4, 0.1 * Math.PI, 0.9 * Math.PI);
-                ctx.stroke();
+                if (this.genero === 'mujer') {
+                    // Labios más definidos
+                    ctx.fillStyle = '#E57373';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2, y + 15, 4, 0, Math.PI);
+                    ctx.fill();
+                    ctx.strokeStyle = '#5D4037';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x + this.ancho / 2 - 4, y + 15);
+                    ctx.quadraticCurveTo(x + this.ancho / 2, y + 12, x + this.ancho / 2 + 4, y + 15);
+                    ctx.stroke();
+                } else {
+                    // Boca más simple
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2, y + 15, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+                    ctx.stroke();
+                }
 
-                // Brazos
+                // Brazos - Diferentes para hombre y mujer
                 ctx.fillStyle = C.PIEL;
                 const brazoY = y + 18;
                 const brazoX = x + (this.mirandoDerecha ? this.ancho : -8);
-                ctx.fillRect(brazoX - 3, brazoY, 6, 14);
+                if (this.genero === 'hombre') {
+                    // Brazos más gruesos
+                    ctx.fillRect(brazoX - 4, brazoY, 8, 14);
+                } else {
+                    // Brazos más delgados
+                    ctx.fillRect(brazoX - 3, brazoY, 6, 14);
+                }
 
                 // Mano / Arma
                 const manoX = brazoX + (this.mirandoDerecha ? 3 : -3);
                 const manoY = brazoY + 12;
                 this.dibujarArma(manoX, manoY);
 
-                // Piernas
-                ctx.fillStyle = this.genero === 'hombre' ? '#1a237e' : '#4a148c';
+                // Piernas - Diferentes para hombre y mujer
+                if (this.genero === 'hombre') {
+                    ctx.fillStyle = '#1a237e';
+                } else {
+                    ctx.fillStyle = '#4a148c';
+                }
                 const paso = this.animacionFrame * 0.3;
                 const offset1 = Math.sin(paso) * 3;
                 const offset2 = Math.sin(paso + Math.PI) * 3;
-                ctx.fillRect(x + 5, y + 38, 6, 12 + offset1);
-                ctx.fillRect(x + 19, y + 38, 6, 12 + offset2);
+                
+                if (this.genero === 'hombre') {
+                    // Piernas más gruesas
+                    ctx.fillRect(x + 4, y + 38, 8, 12 + offset1);
+                    ctx.fillRect(x + 18, y + 38, 8, 12 + offset2);
+                } else {
+                    // Piernas más delgadas con vestido
+                    ctx.fillRect(x + 5, y + 38, 6, 12 + offset1);
+                    ctx.fillRect(x + 19, y + 38, 6, 12 + offset2);
+                }
 
                 // Zapatos
                 ctx.fillStyle = '#4E342E';
-                ctx.fillRect(x + 3, y + 50 + offset1, 10, 4);
-                ctx.fillRect(x + 17, y + 50 + offset2, 10, 4);
+                if (this.genero === 'mujer') {
+                    // Tacones (sutil)
+                    ctx.fillRect(x + 3, y + 50 + offset1, 10, 4);
+                    ctx.fillRect(x + 17, y + 50 + offset2, 10, 4);
+                    // Tacón
+                    ctx.fillRect(x + 1, y + 52 + offset1, 4, 3);
+                    ctx.fillRect(x + 25, y + 52 + offset2, 4, 3);
+                } else {
+                    ctx.fillRect(x + 3, y + 50 + offset1, 10, 4);
+                    ctx.fillRect(x + 17, y + 50 + offset2, 10, 4);
+                }
 
                 ctx.restore();
 
@@ -587,7 +752,6 @@
                     ctx.fillRect(largo + 4, -4, 6, 8);
                     ctx.fillStyle = '#546E7A';
                     ctx.fillRect(largo + 2, -5, 3, 10);
-                    // Cargador
                     ctx.fillStyle = '#1a1a1a';
                     ctx.fillRect(5, 2, 8, 6);
                 }
@@ -596,20 +760,20 @@
             }
 
             dibujarCorazones() {
-                const startX = this.x;
+                const startX = this.x - 10;
                 const startY = this.y - 25;
-                const spacing = 18;
+                const spacing = 20;
                 
                 for (let i = 0; i < this.maxCorazones; i++) {
                     const x = startX + i * spacing;
                     const y = startY;
-                    ctx.font = '18px Arial';
+                    ctx.font = '20px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     if (i < this.corazones) {
                         ctx.fillStyle = '#FF1744';
                         ctx.shadowColor = '#FF1744';
-                        ctx.shadowBlur = 10;
+                        ctx.shadowBlur = 15;
                         ctx.fillText('❤️', x + 8, y + 10);
                     } else {
                         ctx.fillStyle = '#333';
@@ -661,7 +825,6 @@
                     this.y += movY;
                 }
 
-                // Colisión con plataformas
                 for (const p of PLATAFORMAS) {
                     if (this.x + this.ancho > p.x + 2 && this.x < p.x + p.w - 2 &&
                         this.y + this.alto > p.y && this.y + this.alto < p.y + p.h + 10) {
@@ -850,8 +1013,9 @@
             constructor(x, y, angulo) {
                 this.x = x;
                 this.y = y;
-                this.vx = Math.cos(angulo) * 6;
-                this.vy = Math.sin(angulo) * 6 - 2;
+                // Velocidad reducida a la mitad
+                this.vx = Math.cos(angulo) * 3;
+                this.vy = Math.sin(angulo) * 3 - 2;
                 this.radio = 10;
                 this.alive = true;
                 this.timer = 90;
@@ -859,6 +1023,7 @@
                 this.explosionRadio = 0;
                 this.maxExplosion = 130;
                 this.explosionTimer = 0;
+                this.haExplotado = false;
             }
 
             mover() {
@@ -874,7 +1039,6 @@
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Colisión con plataformas
                 for (const p of PLATAFORMAS) {
                     if (this.x > p.x && this.x < p.x + p.w &&
                         this.y + this.radio > p.y && this.y + this.radio < p.y + p.h + 10) {
@@ -890,7 +1054,15 @@
 
                 if (this.timer <= 0) {
                     this.exploto = true;
+                    this.haExplotado = true;
                 }
+            }
+
+            // Verificar colisión con zombi (explosión al contacto)
+            colisionaCon(zombi) {
+                if (this.exploto) return false;
+                const dist = distancia(this.x, this.y, zombi.centroX, zombi.centroY);
+                return dist < this.radio + 16;
             }
 
             dibujar() {
@@ -958,7 +1130,6 @@
             }
 
             encontrarPiso(x, y) {
-                // Buscar el piso más cercano debajo
                 let pisoY = ALTO - 50;
                 for (const p of PLATAFORMAS) {
                     if (x > p.x && x < p.x + p.w && y < p.y) {
@@ -1093,14 +1264,12 @@
 
                 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-                // Disparo continuo
                 setInterval(() => {
                     if (this.mousePresionado && this.jugador.vivo && !this.juegoTerminado) {
                         this.disparar();
                     }
                 }, 50);
 
-                // Controles móviles
                 document.querySelectorAll('#mobileControls button').forEach(btn => {
                     const action = btn.dataset.action;
                     
@@ -1188,7 +1357,6 @@
                 const minutos = Math.floor((tiempoActual - this.tiempoInicio) / 60000);
                 this.minutoActual = minutos;
 
-                // Actualizar jugador
                 this.jugador.mover(this.teclas, this.mouseX, this.mouseY);
                 this.disparoCooldown = Math.max(0, this.disparoCooldown - 1);
 
@@ -1225,10 +1393,23 @@
                 for (let i = this.granadas.length - 1; i >= 0; i--) {
                     const granada = this.granadas[i];
                     granada.mover();
+                    
+                    // Verificar colisión con zombis (explosión al contacto)
+                    if (!granada.exploto) {
+                        for (const zombi of this.zombis) {
+                            if (granada.colisionaCon(zombi)) {
+                                granada.exploto = true;
+                                granada.haExplotado = true;
+                                break;
+                            }
+                        }
+                    }
+                    
                     if (!granada.alive) {
                         this.granadas.splice(i, 1);
                         continue;
                     }
+                    
                     if (granada.exploto) {
                         for (const zombi of this.zombis) {
                             const daño = granada.getDaño(zombi);
@@ -1265,7 +1446,6 @@
                         }
                     }
 
-                    // Disparo de zombis (minuto 3+)
                     if (zombi.puedeDisparar && dist < 350 && dist > 50) {
                         zombi.tiempoDisparo++;
                         if (zombi.tiempoDisparo > 40 + Math.random() * 30) {
@@ -1276,7 +1456,6 @@
                         }
                     }
 
-                    // Colisión con balas del jugador
                     for (let j = this.balas.length - 1; j >= 0; j--) {
                         const bala = this.balas[j];
                         const distBala = distancia(bala.x, bala.y, zombi.centroX, zombi.centroY);
@@ -1298,10 +1477,8 @@
                     }
                 }
 
-                // Limpiar zombis muertos
                 this.zombis = this.zombis.filter(z => z.vida > 0);
 
-                // Actualizar armas en suelo
                 for (let i = this.armasSuelo.length - 1; i >= 0; i--) {
                     const arma = this.armasSuelo[i];
                     arma.timer--;
@@ -1327,7 +1504,6 @@
                     }
                 }
 
-                // Spawn de zombis (indefinido)
                 const spawnRate = Math.max(300, 1200 - (minutos * 20));
                 if (tiempoActual - this.ultimoSpawn > spawnRate) {
                     this.zombisPorSpawn = 1 + Math.floor(minutos * 0.2);
@@ -1346,7 +1522,6 @@
             dibujar() {
                 ctx.clearRect(0, 0, ANCHO, ALTO);
 
-                // Fondo
                 const grad = ctx.createLinearGradient(0, 0, 0, ALTO);
                 grad.addColorStop(0, '#0a0a1a');
                 grad.addColorStop(0.5, '#1a1a2e');
@@ -1354,7 +1529,6 @@
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, ANCHO, ALTO);
 
-                // Suelo
                 ctx.fillStyle = 'rgba(30, 30, 50, 0.5)';
                 ctx.fillRect(0, ALTO - 50, ANCHO, 50);
                 ctx.fillStyle = 'rgba(40, 40, 60, 0.3)';
@@ -1362,7 +1536,6 @@
                     ctx.fillRect(i, ALTO - 50, 1, 50);
                 }
 
-                // Plataformas
                 for (const p of PLATAFORMAS) {
                     ctx.fillStyle = 'rgba(60, 70, 90, 0.6)';
                     ctx.shadowColor = 'rgba(0,0,0,0.3)';
@@ -1375,7 +1548,6 @@
                     ctx.fillRect(p.x + 5, p.y + 2, p.w - 10, 3);
                 }
 
-                // Dibujar elementos
                 for (const arma of this.armasSuelo) {
                     arma.dibujar();
                 }
@@ -1410,7 +1582,6 @@
                 const minutos = Math.floor((tiempoActual - this.tiempoInicio) / 60000);
                 const segundos = Math.floor((tiempoActual - this.tiempoInicio) / 1000) % 60;
 
-                // Panel superior
                 ctx.fillStyle = 'rgba(0,0,0,0.7)';
                 ctx.beginPath();
                 ctx.roundRect(10, 10, 280, 80, 10);
@@ -1450,7 +1621,6 @@
                 ctx.font = '14px Arial';
                 ctx.fillText(`💣 ${this.jugador.granadas}`, 180, 70);
 
-                // Récord
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = 'rgba(255,215,0,0.5)';
