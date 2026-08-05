@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Zombie Survivor - Contra Style Mejorado</title>
     <style>
         * {
@@ -20,22 +20,25 @@
             user-select: none;
             overflow: hidden;
             touch-action: none;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
         #gameContainer {
             position: relative;
             border: 3px solid #333;
             border-radius: 8px;
             box-shadow: 0 0 40px rgba(255, 0, 0, 0.2);
-            max-width: 100vw;
-            max-height: 100vh;
+            touch-action: none;
         }
         canvas {
             display: block;
             background: #1a1a2e;
-            cursor: crosshair;
+            touch-action: none;
             width: 100%;
             height: auto;
-            touch-action: none;
         }
         #mobileControls {
             position: absolute;
@@ -44,7 +47,7 @@
             right: 0;
             display: none;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 15px;
             z-index: 15;
             pointer-events: none;
         }
@@ -55,17 +58,19 @@
             border: 2px solid rgba(255,255,255,0.2);
             border-radius: 50%;
             color: white;
-            font-size: 1.2rem;
-            width: 50px;
-            height: 50px;
+            font-size: 1.4rem;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             touch-action: none;
             user-select: none;
             -webkit-touch-callout: none;
-            min-width: 40px;
-            min-height: 40px;
+            min-width: 50px;
+            min-height: 50px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
         #mobileControls button:active {
             background: rgba(255,255,255,0.35);
@@ -73,46 +78,48 @@
         }
         .dpad {
             display: grid;
-            grid-template-columns: 50px 50px 50px;
-            grid-template-rows: 50px 50px 50px;
-            gap: 3px;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 60px 60px 60px;
+            gap: 4px;
             pointer-events: none;
         }
         .dpad button {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
             background: rgba(255,255,255,0.12);
             border: 2px solid rgba(255,255,255,0.15);
             color: white;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             pointer-events: all;
             backdrop-filter: blur(4px);
-            min-width: 40px;
-            min-height: 40px;
+            min-width: 50px;
+            min-height: 50px;
         }
         .dpad button:active {
             background: rgba(255,255,255,0.3);
         }
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             pointer-events: none;
             align-items: flex-end;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .action-buttons button {
-            width: 55px;
-            height: 55px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             background: rgba(255,50,50,0.25);
             border: 2px solid rgba(255,50,50,0.4);
             color: white;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: bold;
             pointer-events: all;
             backdrop-filter: blur(4px);
-            min-width: 45px;
-            min-height: 45px;
+            min-width: 50px;
+            min-height: 50px;
         }
         .action-buttons button:nth-child(2) {
             background: rgba(255,200,50,0.25);
@@ -125,29 +132,109 @@
         .action-buttons button:active {
             transform: scale(0.9);
         }
+        #aimHelper {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+        }
+        #aimHelper .crosshair {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #aimHelper .crosshair::before,
+        #aimHelper .crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255,255,255,0.3);
+        }
+        #aimHelper .crosshair::before {
+            width: 2px;
+            height: 10px;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #aimHelper .crosshair::after {
+            width: 10px;
+            height: 2px;
+            top: 50%;
+            left: -5px;
+            transform: translateY(-50%);
+        }
+        #aimDot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255,0,0,0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+            display: none;
+            box-shadow: 0 0 10px rgba(255,0,0,0.3);
+        }
         @media (max-width: 768px) {
             #mobileControls { display: flex !important; }
-            .dpad button { width: 45px; height: 45px; font-size: 1.2rem; }
-            .action-buttons button { width: 48px; height: 48px; font-size: 0.6rem; }
+            .dpad button { width: 55px; height: 55px; font-size: 1.4rem; }
+            .action-buttons button { width: 58px; height: 58px; font-size: 0.7rem; }
+            #aimHelper { display: block !important; }
+            #aimDot { display: block !important; }
         }
         @media (max-width: 480px) {
-            .dpad { grid-template-columns: 40px 40px 40px; grid-template-rows: 40px 40px 40px; gap: 2px; }
-            .dpad button { width: 40px; height: 40px; font-size: 1rem; }
-            .action-buttons button { width: 42px; height: 42px; font-size: 0.5rem; }
+            .dpad { grid-template-columns: 50px 50px 50px; grid-template-rows: 50px 50px 50px; gap: 3px; }
+            .dpad button { width: 50px; height: 50px; font-size: 1.2rem; }
+            .action-buttons button { width: 52px; height: 52px; font-size: 0.6rem; }
+            #mobileControls { padding: 0 8px; bottom: 5px; }
         }
         @media (orientation: portrait) and (max-width: 768px) {
             #gameContainer {
-                transform: rotate(90deg);
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                border: none;
+                border-radius: 0;
+                transform: rotate(0deg);
                 transform-origin: center center;
-                width: 100vh;
-                height: 100vw;
-                max-width: 100vh;
-                max-height: 100vw;
+            }
+            canvas {
+                width: 100vw !important;
+                height: 100vh !important;
+                object-fit: contain;
             }
             body {
                 overflow: hidden;
                 height: 100vh;
                 width: 100vw;
+            }
+            #mobileControls {
+                bottom: 5px;
+                padding: 0 5px;
+            }
+            .dpad button, #mobileControls button {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 1rem !important;
+                min-width: 35px !important;
+                min-height: 35px !important;
+            }
+            .dpad {
+                grid-template-columns: 45px 45px 45px;
+                grid-template-rows: 45px 45px 45px;
+                gap: 2px;
+            }
+            .action-buttons {
+                gap: 6px;
+            }
+            .action-buttons button {
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 0.6rem !important;
             }
         }
         @media (orientation: landscape) and (max-width: 768px) {
@@ -156,13 +243,47 @@
                 height: 100vh;
                 max-width: 100vw;
                 max-height: 100vh;
+                border: none;
+                border-radius: 0;
             }
+            canvas {
+                width: 100vw !important;
+                height: 100vh !important;
+                object-fit: contain;
+            }
+            #mobileControls {
+                bottom: 5px;
+                padding: 0 10px;
+            }
+        }
+        /* Ajuste para pantallas muy pequeñas */
+        @media (max-height: 600px) and (orientation: portrait) {
+            .dpad button, #mobileControls button {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 0.8rem !important;
+                min-width: 30px !important;
+                min-height: 30px !important;
+            }
+            .dpad {
+                grid-template-columns: 35px 35px 35px;
+                grid-template-rows: 35px 35px 35px;
+                gap: 2px;
+            }
+            .action-buttons button {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 0.5rem !important;
+            }
+            #mobileControls { padding: 0 3px; bottom: 3px; }
         }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <canvas id="gameCanvas" width="900" height="600"></canvas>
+        <div id="aimHelper"><div class="crosshair"></div></div>
+        <div id="aimDot"></div>
         
         <div id="mobileControls">
             <div class="dpad">
@@ -183,8 +304,46 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const aimHelper = document.getElementById('aimHelper');
+        const aimDot = document.getElementById('aimDot');
         const ANCHO = 900;
         const ALTO = 600;
+
+        // ==================== AJUSTE DE PANTALLA ====================
+        function ajustarCanvas() {
+            const container = document.getElementById('gameContainer');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // En móvil, el canvas ocupa toda la pantalla
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const ratio = ANCHO / ALTO;
+                
+                if (w / h > ratio) {
+                    canvas.style.width = (h * ratio) + 'px';
+                    canvas.style.height = h + 'px';
+                } else {
+                    canvas.style.width = w + 'px';
+                    canvas.style.height = (w / ratio) + 'px';
+                }
+                
+                // Actualizar posición del aim helper
+                const rect = canvas.getBoundingClientRect();
+                aimHelper.style.left = rect.left + 'px';
+                aimHelper.style.top = rect.top + 'px';
+                aimHelper.style.width = rect.width + 'px';
+                aimHelper.style.height = rect.height + 'px';
+                aimDot.style.left = (rect.left + rect.width/2) + 'px';
+                aimDot.style.top = (rect.top + rect.height/2) + 'px';
+            } else {
+                canvas.style.width = '900px';
+                canvas.style.height = '600px';
+            }
+        }
+
+        window.addEventListener('resize', ajustarCanvas);
+        window.addEventListener('load', ajustarCanvas);
 
         // ==================== PLATAFORMAS ====================
         const PLATAFORMAS = [
@@ -220,6 +379,7 @@
         let puntajeMaximo = parseInt(localStorage.getItem('zombiePuntajeMaximo')) || 0;
         let juegoActual = null;
         let enMenu = true;
+        let esMovil = window.innerWidth <= 768;
 
         // ==================== UTILIDADES ====================
         function distancia(x1, y1, x2, y2) {
@@ -232,11 +392,6 @@
 
         function aleatorioInt(min, max) {
             return Math.floor(aleatorio(min, max + 1));
-        }
-
-        function colisionRect(a, b) {
-            return a.x < b.x + b.w && a.x + a.w > b.x &&
-                   a.y < b.y + b.h && a.y + a.h > b.y;
         }
 
         // ==================== PARTÍCULAS ====================
@@ -478,19 +633,16 @@
 
                 // ===== CUERPO =====
                 if (this.genero === 'hombre') {
-                    // Hombre - Cuerpo atlético
                     const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
                     grad.addColorStop(0, '#1a237e');
                     grad.addColorStop(0.5, '#283593');
                     grad.addColorStop(1, '#1a237e');
                     ctx.fillStyle = grad;
                     ctx.shadowBlur = 10;
-                    // Torso
                     ctx.beginPath();
                     ctx.roundRect(x + 3, y + 12, 24, 24, 3);
                     ctx.fill();
                     
-                    // Músculos (pectorales)
                     ctx.fillStyle = 'rgba(255,255,255,0.1)';
                     ctx.beginPath();
                     ctx.arc(x + 10, y + 18, 5, 0, Math.PI * 2);
@@ -499,18 +651,15 @@
                     ctx.arc(x + 20, y + 18, 5, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Cinturón
                     ctx.fillStyle = '#4a2c0a';
                     ctx.fillRect(x + 3, y + 32, 24, 4);
                     ctx.fillStyle = '#FFD700';
                     ctx.fillRect(x + 12, y + 32, 6, 4);
                     
-                    // Hombros anchos
                     ctx.fillStyle = '#1a237e';
                     ctx.fillRect(x, y + 14, 5, 8);
                     ctx.fillRect(x + 25, y + 14, 5, 8);
                 } else {
-                    // Mujer - Cuerpo estilizado
                     const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
                     grad.addColorStop(0, '#4a148c');
                     grad.addColorStop(0.5, '#7b1fa2');
@@ -518,12 +667,10 @@
                     ctx.fillStyle = grad;
                     ctx.shadowBlur = 10;
                     
-                    // Torso más delgado
                     ctx.beginPath();
                     ctx.roundRect(x + 5, y + 12, 20, 20, 4);
                     ctx.fill();
                     
-                    // Pecho (sutil)
                     ctx.fillStyle = 'rgba(255,255,255,0.15)';
                     ctx.beginPath();
                     ctx.arc(x + 11, y + 18, 4, 0, Math.PI * 2);
@@ -532,7 +679,6 @@
                     ctx.arc(x + 19, y + 18, 4, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Vestido - falda
                     ctx.fillStyle = '#6a1b9a';
                     ctx.beginPath();
                     ctx.moveTo(x + 4, y + 32);
@@ -542,11 +688,9 @@
                     ctx.closePath();
                     ctx.fill();
                     
-                    // Cintura marcada
                     ctx.fillStyle = '#4a148c';
                     ctx.fillRect(x + 8, y + 28, 14, 3);
                     
-                    // Hombros estrechos
                     ctx.fillStyle = '#4a148c';
                     ctx.fillRect(x + 2, y + 14, 4, 6);
                     ctx.fillRect(x + 24, y + 14, 4, 6);
@@ -565,40 +709,30 @@
 
                 // ===== PELO =====
                 if (this.genero === 'hombre') {
-                    // Pelo corto y prolijo
                     ctx.fillStyle = '#2c1810';
-                    // Parte superior
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2, y + 4, 13, -Math.PI, 0);
                     ctx.fill();
-                    // Lado izquierdo
                     ctx.beginPath();
                     ctx.arc(x + 8, y + 6, 8, Math.PI * 0.5, Math.PI * 1.5);
                     ctx.fill();
-                    // Lado derecho
                     ctx.beginPath();
                     ctx.arc(x + 22, y + 6, 8, -Math.PI * 0.5, Math.PI * 0.5);
                     ctx.fill();
-                    // Flequillo
                     ctx.fillRect(x + 5, y + 2, 20, 4);
                     
-                    // ===== ANTEOJOS NEGROS =====
                     ctx.strokeStyle = '#1a1a1a';
                     ctx.lineWidth = 2;
-                    // Marco izquierdo
                     ctx.beginPath();
                     ctx.arc(x + 10, y + 8, 6, 0, Math.PI * 2);
                     ctx.stroke();
-                    // Marco derecho
                     ctx.beginPath();
                     ctx.arc(x + 20, y + 8, 6, 0, Math.PI * 2);
                     ctx.stroke();
-                    // Puente
                     ctx.beginPath();
                     ctx.moveTo(x + 14, y + 8);
                     ctx.lineTo(x + 16, y + 8);
                     ctx.stroke();
-                    // Patillas
                     ctx.beginPath();
                     ctx.moveTo(x + 6, y + 8);
                     ctx.lineTo(x + 4, y + 12);
@@ -607,7 +741,6 @@
                     ctx.moveTo(x + 24, y + 8);
                     ctx.lineTo(x + 26, y + 12);
                     ctx.stroke();
-                    // Lentes oscuros
                     ctx.fillStyle = 'rgba(20,20,20,0.7)';
                     ctx.beginPath();
                     ctx.arc(x + 10, y + 8, 5, 0, Math.PI * 2);
@@ -615,7 +748,6 @@
                     ctx.beginPath();
                     ctx.arc(x + 20, y + 8, 5, 0, Math.PI * 2);
                     ctx.fill();
-                    // Reflejo en lentes
                     ctx.fillStyle = 'rgba(255,255,255,0.2)';
                     ctx.beginPath();
                     ctx.arc(x + 8, y + 6, 2, 0, Math.PI * 2);
@@ -624,11 +756,8 @@
                     ctx.arc(x + 18, y + 6, 2, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    // ===== MUJER - PELO LARGO PROLIJO =====
-                    // Color de pelo (castaño claro)
                     ctx.fillStyle = '#8D6E63';
                     
-                    // Pelo principal - caída suave
                     ctx.beginPath();
                     ctx.moveTo(x + 6, y + 4);
                     ctx.quadraticCurveTo(x + 2, y + 12, x + 4, y + 28);
@@ -643,7 +772,6 @@
                     ctx.quadraticCurveTo(x + 20, y + 16, x + 24, y + 4);
                     ctx.fill();
                     
-                    // Pelo trasero
                     ctx.beginPath();
                     ctx.moveTo(x + 4, y + 6);
                     ctx.quadraticCurveTo(x + 2, y + 20, x + 6, y + 34);
@@ -658,18 +786,15 @@
                     ctx.quadraticCurveTo(x + 18, y + 22, x + 26, y + 6);
                     ctx.fill();
                     
-                    // Parte superior del pelo
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2, y + 2, 14, -Math.PI, 0);
                     ctx.fill();
                     
-                    // Moño elegante
                     ctx.fillStyle = '#6D4C41';
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2 + 12 * dir, y, 5, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Lazo decorativo
                     ctx.fillStyle = '#E91E63';
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2 + 14 * dir, y - 2, 3, 0, Math.PI * 2);
@@ -677,14 +802,11 @@
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2 + 10 * dir, y - 2, 3, 0, Math.PI * 2);
                     ctx.fill();
-                    // Cintas del lazo
                     ctx.fillRect(x + this.ancho / 2 + 11 * dir, y + 2, 2, 6);
                     ctx.fillRect(x + this.ancho / 2 + 13 * dir, y + 2, 2, 6);
                     
-                    // ===== OJOS CON PESTAÑAS LARGAS =====
                     const ojoX = x + this.ancho / 2 + (this.mirandoDerecha ? 4 : -4);
                     
-                    // Ojos grandes
                     ctx.fillStyle = C.BLANCO;
                     ctx.beginPath();
                     ctx.arc(ojoX - 4, y + 8, 4, 0, Math.PI * 2);
@@ -693,7 +815,6 @@
                     ctx.arc(ojoX + 4, y + 8, 4, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Iris (ojos cafés)
                     ctx.fillStyle = '#5D4037';
                     ctx.beginPath();
                     ctx.arc(ojoX - 3 + (this.mirandoDerecha ? 1 : -1), y + 9, 2.5, 0, Math.PI * 2);
@@ -702,7 +823,6 @@
                     ctx.arc(ojoX + 5 + (this.mirandoDerecha ? 1 : -1), y + 9, 2.5, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Brillo en ojos
                     ctx.fillStyle = C.BLANCO;
                     ctx.beginPath();
                     ctx.arc(ojoX - 4 + (this.mirandoDerecha ? 1 : -1), y + 7, 1.2, 0, Math.PI * 2);
@@ -711,10 +831,8 @@
                     ctx.arc(ojoX + 4 + (this.mirandoDerecha ? 1 : -1), y + 7, 1.2, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Pestañas largas y definidas
                     ctx.strokeStyle = '#1a1a2e';
                     ctx.lineWidth = 1.5;
-                    // Pestañas superiores
                     for (let i = -1; i <= 1; i+=0.5) {
                         ctx.beginPath();
                         ctx.moveTo(ojoX - 4 + i * 3, y + 5);
@@ -725,7 +843,6 @@
                         ctx.lineTo(ojoX + 4 + i * 4, y + 2);
                         ctx.stroke();
                     }
-                    // Pestañas inferiores
                     ctx.lineWidth = 1;
                     for (let i = -0.5; i <= 0.5; i+=0.5) {
                         ctx.beginPath();
@@ -738,17 +855,14 @@
                         ctx.stroke();
                     }
                     
-                    // ===== LABIOS =====
                     ctx.fillStyle = '#E57373';
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2, y + 15, 4, 0, Math.PI);
                     ctx.fill();
-                    // Brillo en labios
                     ctx.fillStyle = 'rgba(255,255,255,0.2)';
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2 - 1, y + 13, 1.5, 0, Math.PI * 2);
                     ctx.fill();
-                    // Línea de labios
                     ctx.strokeStyle = '#C62828';
                     ctx.lineWidth = 1;
                     ctx.beginPath();
@@ -756,7 +870,6 @@
                     ctx.quadraticCurveTo(x + this.ancho / 2, y + 12, x + this.ancho / 2 + 4, y + 15);
                     ctx.stroke();
                     
-                    // ===== CEJAS ARQUEADAS =====
                     ctx.strokeStyle = '#5D4037';
                     ctx.lineWidth = 1.5;
                     ctx.beginPath();
@@ -769,9 +882,7 @@
                     ctx.stroke();
                 }
 
-                // ===== BOCA (común para ambos, pero con variación) =====
                 if (this.genero === 'hombre') {
-                    // Boca masculina simple
                     ctx.strokeStyle = '#5D4037';
                     ctx.lineWidth = 1.5;
                     ctx.beginPath();
@@ -779,13 +890,11 @@
                     ctx.stroke();
                 }
 
-                // ===== BRAZOS =====
                 ctx.fillStyle = C.PIEL;
                 const brazoY = y + 18;
                 const brazoX = x + (this.mirandoDerecha ? this.ancho : -8);
                 if (this.genero === 'hombre') {
                     ctx.fillRect(brazoX - 4, brazoY, 8, 14);
-                    // Músculo
                     ctx.fillStyle = 'rgba(255,200,150,0.2)';
                     ctx.beginPath();
                     ctx.arc(brazoX + (this.mirandoDerecha ? 0 : 4), brazoY + 4, 4, 0, Math.PI * 2);
@@ -794,12 +903,10 @@
                     ctx.fillRect(brazoX - 3, brazoY, 6, 14);
                 }
 
-                // Mano / Arma
                 const manoX = brazoX + (this.mirandoDerecha ? 3 : -3);
                 const manoY = brazoY + 12;
                 this.dibujarArma(manoX, manoY);
 
-                // ===== PIERNAS =====
                 if (this.genero === 'hombre') {
                     ctx.fillStyle = '#1a237e';
                 } else {
@@ -817,13 +924,10 @@
                     ctx.fillRect(x + 18, y + 38, 6, 12 + offset2);
                 }
 
-                // Zapatos
                 ctx.fillStyle = '#4E342E';
                 if (this.genero === 'mujer') {
-                    // Tacón elegante
                     ctx.fillRect(x + 4, y + 50 + offset1, 9, 4);
                     ctx.fillRect(x + 17, y + 50 + offset2, 9, 4);
-                    // Tacón
                     ctx.fillRect(x + 2, y + 52 + offset1, 4, 4);
                     ctx.fillRect(x + 24, y + 52 + offset2, 4, 4);
                 } else {
@@ -833,7 +937,6 @@
 
                 ctx.restore();
 
-                // Corazones
                 this.dibujarCorazones();
             }
 
@@ -1315,6 +1418,7 @@
                 this.balasEnemigas = [];
                 this.armasSuelo = [];
                 this.granadas = [];
+                this.granadasSuelo = []; // Granadas que caen al piso
                 this.puntuacion = 0;
                 this.tiempoInicio = Date.now();
                 this.ultimoSpawn = 0;
@@ -1331,6 +1435,7 @@
                 this.disparoCooldown = 0;
                 this.minutoActual = 0;
                 this.spawnCount = 0;
+                this.tiempoGranadaSuelo = 0;
 
                 this.setupEventListeners();
                 this.buclePrincipal();
@@ -1358,12 +1463,22 @@
                 document.addEventListener('keydown', keyHandler);
                 document.addEventListener('keyup', keyHandler);
 
+                // Mouse events
                 canvas.addEventListener('mousemove', (e) => {
                     const rect = canvas.getBoundingClientRect();
                     const scaleX = canvas.width / rect.width;
                     const scaleY = canvas.height / rect.height;
                     this.mouseX = (e.clientX - rect.left) * scaleX;
                     this.mouseY = (e.clientY - rect.top) * scaleY;
+                    
+                    // Actualizar aim helper en móvil
+                    if (esMovil) {
+                        const containerRect = document.getElementById('gameContainer').getBoundingClientRect();
+                        const aimX = e.clientX - containerRect.left;
+                        const aimY = e.clientY - containerRect.top;
+                        aimDot.style.left = e.clientX + 'px';
+                        aimDot.style.top = e.clientY + 'px';
+                    }
                 });
 
                 canvas.addEventListener('mousedown', (e) => {
@@ -1385,14 +1500,59 @@
                     this.mousePresionado = false;
                 });
 
+                // Touch events para móvil - apuntado y disparo
+                canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    if (touch) {
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        this.mouseX = (touch.clientX - rect.left) * scaleX;
+                        this.mouseY = (touch.clientY - rect.top) * scaleY;
+                        this.mousePresionado = true;
+                        
+                        // Actualizar aim dot
+                        const containerRect = document.getElementById('gameContainer').getBoundingClientRect();
+                        aimDot.style.left = touch.clientX + 'px';
+                        aimDot.style.top = touch.clientY + 'px';
+                        
+                        if (this.jugador.vivo && !this.juegoTerminado) {
+                            this.disparar();
+                        }
+                    }
+                }, { passive: false });
+
+                canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    if (touch) {
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = canvas.width / rect.width;
+                        const scaleY = canvas.height / rect.height;
+                        this.mouseX = (touch.clientX - rect.left) * scaleX;
+                        this.mouseY = (touch.clientY - rect.top) * scaleY;
+                        
+                        aimDot.style.left = touch.clientX + 'px';
+                        aimDot.style.top = touch.clientY + 'px';
+                    }
+                }, { passive: false });
+
+                canvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.mousePresionado = false;
+                }, { passive: false });
+
                 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
+                // Disparo continuo
                 setInterval(() => {
                     if (this.mousePresionado && this.jugador.vivo && !this.juegoTerminado) {
                         this.disparar();
                     }
-                }, 50);
+                }, 80);
 
+                // Controles móviles
                 document.querySelectorAll('#mobileControls button').forEach(btn => {
                     const action = btn.dataset.action;
                     
@@ -1483,6 +1643,42 @@
                 this.jugador.mover(this.teclas, this.mouseX, this.mouseY);
                 this.disparoCooldown = Math.max(0, this.disparoCooldown - 1);
 
+                // Spawn de granadas en el suelo (cada 30 segundos)
+                this.tiempoGranadaSuelo++;
+                if (this.tiempoGranadaSuelo > 1800 && this.granadasSuelo.length < 3) { // ~30 segundos
+                    this.tiempoGranadaSuelo = 0;
+                    const x = 50 + Math.random() * (ANCHO - 100);
+                    const y = 50 + Math.random() * (ALTO - 150);
+                    const granadaSuelo = {
+                        x: x,
+                        y: y,
+                        radio: 12,
+                        activo: true,
+                        tiempo: 0
+                    };
+                    this.granadasSuelo.push(granadaSuelo);
+                    crearParticulas(x, y, '#FFD700', 10, 3);
+                }
+
+                // Recoger granadas del suelo
+                for (let i = this.granadasSuelo.length - 1; i >= 0; i--) {
+                    const g = this.granadasSuelo[i];
+                    if (!g.activo) {
+                        this.granadasSuelo.splice(i, 1);
+                        continue;
+                    }
+                    const dist = distancia(g.x, g.y, this.jugador.centroX, this.jugador.centroY);
+                    if (dist < 35) {
+                        if (this.jugador.granadas < this.jugador.maxGranadas) {
+                            this.jugador.granadas++;
+                            g.activo = false;
+                            this.granadasSuelo.splice(i, 1);
+                            crearParticulas(g.x, g.y, '#FFD700', 15, 4);
+                        }
+                    }
+                }
+
+                // Actualizar balas del jugador
                 for (let i = this.balas.length - 1; i >= 0; i--) {
                     const bala = this.balas[i];
                     bala.mover();
@@ -1491,6 +1687,7 @@
                     }
                 }
 
+                // Actualizar balas enemigas
                 for (let i = this.balasEnemigas.length - 1; i >= 0; i--) {
                     const bala = this.balasEnemigas[i];
                     bala.mover();
@@ -1510,6 +1707,7 @@
                     }
                 }
 
+                // Actualizar granadas
                 for (let i = this.granadas.length - 1; i >= 0; i--) {
                     const granada = this.granadas[i];
                     granada.mover();
@@ -1548,6 +1746,7 @@
                     }
                 }
 
+                // Actualizar zombis
                 for (let i = this.zombis.length - 1; i >= 0; i--) {
                     const zombi = this.zombis[i];
                     zombi.moverHacia(this.jugador);
@@ -1664,6 +1863,33 @@
                     ctx.shadowBlur = 0;
                     ctx.fillStyle = 'rgba(100, 120, 150, 0.3)';
                     ctx.fillRect(p.x + 5, p.y + 2, p.w - 10, 3);
+                }
+
+                // Dibujar granadas en el suelo
+                for (const g of this.granadasSuelo) {
+                    if (!g.activo) continue;
+                    ctx.shadowColor = '#FFD700';
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.beginPath();
+                    ctx.arc(g.x, g.y, g.radio, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.fillRect(g.x - 3, g.y - 14, 6, 4);
+                    ctx.fillStyle = '#FFD700';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowBlur = 0;
+                    ctx.fillText('💣', g.x, g.y);
+                    // Brillo
+                    ctx.shadowColor = 'rgba(255,215,0,0.3)';
+                    ctx.shadowBlur = 30;
+                    ctx.beginPath();
+                    ctx.arc(g.x, g.y, g.radio + 6, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255,215,0,0.1)';
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
                 }
 
                 for (const arma of this.armasSuelo) {
@@ -1933,7 +2159,7 @@
                     ctx.fillText('💡 Doble salto | G: Granada | E/Q: Cambiar arma', ANCHO / 2, 430);
                     ctx.fillStyle = 'rgba(255,255,255,0.2)';
                     ctx.font = '12px Arial';
-                    ctx.fillText('📱 Controles táctiles disponibles en móvil', ANCHO / 2, 460);
+                    ctx.fillText('📱 Toca la pantalla para apuntar y disparar', ANCHO / 2, 460);
 
                     ctx.fillStyle = 'rgba(255,255,255,0.15)';
                     ctx.font = '12px Arial';
