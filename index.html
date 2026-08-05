@@ -177,18 +177,40 @@
             display: none;
             box-shadow: 0 0 10px rgba(255,0,0,0.3);
         }
+        #musicToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 20;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            pointer-events: all;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: none;
+        }
+        #musicToggle:hover {
+            background: rgba(0,0,0,0.8);
+        }
         @media (max-width: 768px) {
             #mobileControls { display: flex !important; }
             .dpad button { width: 55px; height: 55px; font-size: 1.4rem; }
             .action-buttons button { width: 58px; height: 58px; font-size: 0.7rem; }
             #aimHelper { display: block !important; }
             #aimDot { display: block !important; }
+            #musicToggle { display: block !important; font-size: 14px; padding: 5px 10px; top: 5px; right: 5px; }
         }
         @media (max-width: 480px) {
             .dpad { grid-template-columns: 50px 50px 50px; grid-template-rows: 50px 50px 50px; gap: 3px; }
             .dpad button { width: 50px; height: 50px; font-size: 1.2rem; }
             .action-buttons button { width: 52px; height: 52px; font-size: 0.6rem; }
             #mobileControls { padding: 0 8px; bottom: 5px; }
+            #musicToggle { font-size: 12px; padding: 4px 8px; }
         }
         @media (orientation: portrait) and (max-width: 768px) {
             #gameContainer {
@@ -256,7 +278,6 @@
                 padding: 0 10px;
             }
         }
-        /* Ajuste para pantallas muy pequeñas */
         @media (max-height: 600px) and (orientation: portrait) {
             .dpad button, #mobileControls button {
                 width: 35px !important;
@@ -282,6 +303,7 @@
 <body>
     <div id="gameContainer">
         <canvas id="gameCanvas" width="900" height="600"></canvas>
+        <button id="musicToggle">🔊 Música ON</button>
         <div id="aimHelper"><div class="crosshair"></div></div>
         <div id="aimDot"></div>
         
@@ -306,6 +328,7 @@
         const ctx = canvas.getContext('2d');
         const aimHelper = document.getElementById('aimHelper');
         const aimDot = document.getElementById('aimDot');
+        const musicToggle = document.getElementById('musicToggle');
         const ANCHO = 900;
         const ALTO = 600;
 
@@ -315,7 +338,6 @@
             const isMobile = window.innerWidth <= 768;
             
             if (isMobile) {
-                // En móvil, el canvas ocupa toda la pantalla
                 const w = window.innerWidth;
                 const h = window.innerHeight;
                 const ratio = ANCHO / ALTO;
@@ -328,7 +350,6 @@
                     canvas.style.height = (w / ratio) + 'px';
                 }
                 
-                // Actualizar posición del aim helper
                 const rect = canvas.getBoundingClientRect();
                 aimHelper.style.left = rect.left + 'px';
                 aimHelper.style.top = rect.top + 'px';
@@ -380,6 +401,82 @@
         let juegoActual = null;
         let enMenu = true;
         let esMovil = window.innerWidth <= 768;
+        let musicaActiva = true;
+        let audioCtx = null;
+        let oscilador = null;
+        let ganancia = null;
+        let musicaInterval = null;
+
+        // ==================== MUSICA DE SUSPENSO ====================
+        function iniciarMusica() {
+            if (!musicaActiva) return;
+            try {
+                if (audioCtx) {
+                    try { audioCtx.close(); } catch(e) {}
+                }
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                function tocarNota(frec, duracion, volumen = 0.08) {
+                    if (!audioCtx || !musicaActiva) return;
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.value = frec;
+                        gain.gain.value = volumen;
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duracion);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + duracion);
+                    } catch(e) {}
+                }
+
+                if (musicaInterval) clearInterval(musicaInterval);
+                musicaInterval = setInterval(() => {
+                    if (!musicaActiva || !juegoActual || juegoActual.juegoTerminado) return;
+                    const notas = [180, 220, 260, 300, 340, 380];
+                    const nota = notas[Math.floor(Math.random() * notas.length)];
+                    const duracion = 0.15 + Math.random() * 0.25;
+                    const vol = 0.04 + Math.random() * 0.06;
+                    tocarNota(nota, duracion, vol);
+                    
+                    if (Math.random() > 0.5) {
+                        setTimeout(() => {
+                            tocarNota(nota * 1.25, duracion * 0.5, vol * 0.6);
+                        }, 80 + Math.random() * 120);
+                    }
+                    if (Math.random() > 0.7) {
+                        setTimeout(() => {
+                            tocarNota(nota * 0.8, duracion * 0.7, vol * 0.5);
+                        }, 150 + Math.random() * 100);
+                    }
+                }, 500 + Math.random() * 300);
+            } catch(e) {}
+        }
+
+        function detenerMusica() {
+            if (musicaInterval) {
+                clearInterval(musicaInterval);
+                musicaInterval = null;
+            }
+            if (audioCtx) {
+                try { audioCtx.close(); } catch(e) {}
+                audioCtx = null;
+            }
+        }
+
+        function toggleMusica() {
+            musicaActiva = !musicaActiva;
+            musicToggle.textContent = musicaActiva ? '🔊 Música ON' : '🔇 Música OFF';
+            if (musicaActiva) {
+                iniciarMusica();
+            } else {
+                detenerMusica();
+            }
+        }
+
+        musicToggle.addEventListener('click', toggleMusica);
 
         // ==================== UTILIDADES ====================
         function distancia(x1, y1, x2, y2) {
@@ -440,6 +537,185 @@
         }
 
         // ==================== CLASES ====================
+        class Perro {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.ancho = 25;
+                this.alto = 20;
+                this.vivo = true;
+                this.velocidad = 3.5;
+                this.tiempoAtaque = 0;
+                this.objetivo = null;
+                this.animacion = 0;
+                this.animacionFrame = 0;
+                this.tiempoAnimacion = 0;
+                this.mirandoDerecha = true;
+            }
+
+            get centroX() { return this.x + this.ancho / 2; }
+            get centroY() { return this.y + this.alto / 2; }
+
+            buscarObjetivo(zombis) {
+                let masCercano = null;
+                let distMinima = Infinity;
+                for (const z of zombis) {
+                    if (!z.vida) continue;
+                    const dist = distancia(this.centroX, this.centroY, z.centroX, z.centroY);
+                    if (dist < distMinima && dist < 400) {
+                        distMinima = dist;
+                        masCercano = z;
+                    }
+                }
+                this.objetivo = masCercano;
+            }
+
+            mover(jugador) {
+                if (!this.vivo) return;
+
+                let dx = 0, dy = 0;
+                if (this.objetivo && this.objetivo.vida) {
+                    dx = this.objetivo.centroX - this.centroX;
+                    dy = this.objetivo.centroY - this.centroY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist > 10) {
+                        this.x += (dx / dist) * this.velocidad;
+                        this.y += (dy / dist) * this.velocidad;
+                    }
+                    this.mirandoDerecha = dx > 0;
+                } else {
+                    // Seguir al jugador
+                    dx = jugador.centroX - this.centroX;
+                    dy = jugador.centroY - this.centroY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist > 60) {
+                        this.x += (dx / dist) * this.velocidad * 0.5;
+                        this.y += (dy / dist) * this.velocidad * 0.5;
+                    }
+                    this.mirandoDerecha = dx > 0;
+                }
+
+                for (const p of PLATAFORMAS) {
+                    if (this.x + this.ancho > p.x + 2 && this.x < p.x + p.w - 2 &&
+                        this.y + this.alto > p.y && this.y + this.alto < p.y + p.h + 10) {
+                        this.y = p.y - this.alto;
+                    }
+                }
+
+                if (this.y + this.alto >= ALTO - 50) {
+                    this.y = ALTO - 50 - this.alto;
+                }
+
+                this.x = Math.max(0, Math.min(ANCHO - this.ancho, this.x));
+                this.y = Math.max(0, Math.min(ALTO - 50 - this.alto, this.y));
+
+                this.tiempoAnimacion += 0.15;
+                if (this.tiempoAnimacion > 1) {
+                    this.tiempoAnimacion = 0;
+                    this.animacionFrame = (this.animacionFrame + 1) % 4;
+                }
+                if (this.tiempoAtaque > 0) this.tiempoAtaque--;
+            }
+
+            atacar(zombis) {
+                if (this.tiempoAtaque > 0 || !this.objetivo || !this.objetivo.vida) return false;
+                const dist = distancia(this.centroX, this.centroY, this.objetivo.centroX, this.objetivo.centroY);
+                if (dist < 40) {
+                    this.objetivo.recibirDaño(2);
+                    this.tiempoAtaque = 30;
+                    crearParticulas(this.objetivo.centroX, this.objetivo.centroY, '#FF6B00', 15, 4);
+                    if (!this.objetivo.vida) {
+                        this.objetivo = null;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            dibujar() {
+                if (!this.vivo) return;
+                const x = this.x;
+                const y = this.y;
+                const dir = this.mirandoDerecha ? 1 : -1;
+
+                ctx.save();
+
+                // Cuerpo
+                ctx.fillStyle = '#8D6E63';
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.roundRect(x + 4, y + 6, 17, 12, 4);
+                ctx.fill();
+
+                // Cabeza
+                ctx.fillStyle = '#8D6E63';
+                ctx.shadowBlur = 5;
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 6 : -6), y + 6, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Hocico
+                ctx.fillStyle = '#6D4C41';
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 12 : -12), y + 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Nariz
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 15 : -15), y + 7, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Ojos
+                ctx.fillStyle = C.BLANCO;
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 8 : -8), y + 4, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#4a2c0a';
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 9 : -9), y + 5, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Orejas
+                ctx.fillStyle = '#6D4C41';
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? -2 : 2), y + 1, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 6 : -6), y + 1, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Collar
+                ctx.fillStyle = '#D32F2F';
+                ctx.fillRect(x + 4, y + 10, 17, 3);
+
+                // Patas
+                ctx.fillStyle = '#6D4C41';
+                const paso = this.animacionFrame * 0.3;
+                ctx.fillRect(x + 3, y + 18 + Math.sin(paso) * 2, 4, 6);
+                ctx.fillRect(x + 9, y + 18 + Math.sin(paso + Math.PI) * 2, 4, 6);
+                ctx.fillRect(x + 15, y + 18 + Math.sin(paso + Math.PI * 0.5) * 2, 4, 6);
+
+                // Cola
+                ctx.strokeStyle = '#8D6E63';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                const colaX = this.mirandoDerecha ? x : x + this.ancho;
+                ctx.moveTo(colaX, y + 8);
+                ctx.quadraticCurveTo(colaX + (this.mirandoDerecha ? -8 : 8), y - 4, colaX + (this.mirandoDerecha ? -12 : 12), y - 8);
+                ctx.stroke();
+
+                ctx.restore();
+
+                // Barra de nombre
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.font = '8px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('🐕‍🦺 REX', this.centroX, y - 6);
+            }
+        }
+
         class Personaje {
             constructor(x, y, genero) {
                 this.x = x;
@@ -631,7 +907,6 @@
                 ctx.shadowBlur = 15;
                 ctx.shadowOffsetY = 5;
 
-                // ===== CUERPO =====
                 if (this.genero === 'hombre') {
                     const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
                     grad.addColorStop(0, '#1a237e');
@@ -698,7 +973,6 @@
 
                 ctx.shadowBlur = 0;
 
-                // ===== CABEZA =====
                 ctx.fillStyle = C.PIEL;
                 ctx.beginPath();
                 ctx.arc(x + this.ancho / 2, y + 9, 12, 0, Math.PI * 2);
@@ -707,7 +981,6 @@
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // ===== PELO =====
                 if (this.genero === 'hombre') {
                     ctx.fillStyle = '#2c1810';
                     ctx.beginPath();
@@ -1418,7 +1691,8 @@
                 this.balasEnemigas = [];
                 this.armasSuelo = [];
                 this.granadas = [];
-                this.granadasSuelo = []; // Granadas que caen al piso
+                this.granadasSuelo = [];
+                this.perro = null;
                 this.puntuacion = 0;
                 this.tiempoInicio = Date.now();
                 this.ultimoSpawn = 0;
@@ -1436,6 +1710,9 @@
                 this.minutoActual = 0;
                 this.spawnCount = 0;
                 this.tiempoGranadaSuelo = 0;
+                this.tiempoPerro = 0;
+                this.perroActivo = false;
+                this.tiempoAtaquePerro = 0;
 
                 this.setupEventListeners();
                 this.buclePrincipal();
@@ -1463,7 +1740,6 @@
                 document.addEventListener('keydown', keyHandler);
                 document.addEventListener('keyup', keyHandler);
 
-                // Mouse events
                 canvas.addEventListener('mousemove', (e) => {
                     const rect = canvas.getBoundingClientRect();
                     const scaleX = canvas.width / rect.width;
@@ -1471,11 +1747,8 @@
                     this.mouseX = (e.clientX - rect.left) * scaleX;
                     this.mouseY = (e.clientY - rect.top) * scaleY;
                     
-                    // Actualizar aim helper en móvil
                     if (esMovil) {
                         const containerRect = document.getElementById('gameContainer').getBoundingClientRect();
-                        const aimX = e.clientX - containerRect.left;
-                        const aimY = e.clientY - containerRect.top;
                         aimDot.style.left = e.clientX + 'px';
                         aimDot.style.top = e.clientY + 'px';
                     }
@@ -1500,7 +1773,6 @@
                     this.mousePresionado = false;
                 });
 
-                // Touch events para móvil - apuntado y disparo
                 canvas.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     const touch = e.touches[0];
@@ -1512,8 +1784,6 @@
                         this.mouseY = (touch.clientY - rect.top) * scaleY;
                         this.mousePresionado = true;
                         
-                        // Actualizar aim dot
-                        const containerRect = document.getElementById('gameContainer').getBoundingClientRect();
                         aimDot.style.left = touch.clientX + 'px';
                         aimDot.style.top = touch.clientY + 'px';
                         
@@ -1545,14 +1815,12 @@
 
                 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-                // Disparo continuo
                 setInterval(() => {
                     if (this.mousePresionado && this.jugador.vivo && !this.juegoTerminado) {
                         this.disparar();
                     }
                 }, 80);
 
-                // Controles móviles
                 document.querySelectorAll('#mobileControls button').forEach(btn => {
                     const action = btn.dataset.action;
                     
@@ -1615,20 +1883,18 @@
 
             spawnZombi(minutos) {
                 const nivelResistencia = Math.min(minutos + 1, 8);
-                const margen = 50;
+                const margen = 80;
                 let x, y;
-
-                const lado = Math.floor(Math.random() * 4);
-                if (lado === 0) { x = Math.random() * ANCHO; y = -margen; }
-                else if (lado === 1) { x = Math.random() * ANCHO; y = ALTO - 50 + margen; }
-                else if (lado === 2) { x = -margen; y = Math.random() * (ALTO - 50); }
-                else { x = ANCHO + margen; y = Math.random() * (ALTO - 50); }
-
-                const dist = distancia(x, y, this.jugador.centroX, this.jugador.centroY);
-                if (dist < 250) {
-                    x = Math.random() * ANCHO;
-                    y = Math.random() * (ALTO - 50);
-                }
+                let intentos = 0;
+                
+                do {
+                    const lado = Math.floor(Math.random() * 4);
+                    if (lado === 0) { x = Math.random() * ANCHO; y = -margen; }
+                    else if (lado === 1) { x = Math.random() * ANCHO; y = ALTO - 50 + margen; }
+                    else if (lado === 2) { x = -margen; y = Math.random() * (ALTO - 50); }
+                    else { x = ANCHO + margen; y = Math.random() * (ALTO - 50); }
+                    intentos++;
+                } while (distancia(x, y, this.jugador.centroX, this.jugador.centroY) < 200 && intentos < 20);
 
                 this.zombis.push(new Zombi(x, y, nivelResistencia));
             }
@@ -1643,9 +1909,28 @@
                 this.jugador.mover(this.teclas, this.mouseX, this.mouseY);
                 this.disparoCooldown = Math.max(0, this.disparoCooldown - 1);
 
-                // Spawn de granadas en el suelo (cada 30 segundos)
+                // Spawn del perro en el minuto 3
+                if (minutos >= 3 && !this.perroActivo && !this.perro) {
+                    this.perro = new Perro(this.jugador.x - 40, this.jugador.y);
+                    this.perroActivo = true;
+                    crearParticulas(this.perro.centroX, this.perro.centroY, '#FFD700', 30, 5);
+                }
+
+                // Actualizar perro
+                if (this.perro && this.perro.vivo) {
+                    this.perro.buscarObjetivo(this.zombis);
+                    this.perro.mover(this.jugador);
+                    if (this.perro.atacar(this.zombis)) {
+                        // El perro mató a un zombi
+                        this.puntuacion += 5;
+                    }
+                    // Limpiar zombis muertos por el perro
+                    this.zombis = this.zombis.filter(z => z.vida > 0);
+                }
+
+                // Granadas en el suelo (cada 30 segundos)
                 this.tiempoGranadaSuelo++;
-                if (this.tiempoGranadaSuelo > 1800 && this.granadasSuelo.length < 3) { // ~30 segundos
+                if (this.tiempoGranadaSuelo > 1800 && this.granadasSuelo.length < 3) {
                     this.tiempoGranadaSuelo = 0;
                     const x = 50 + Math.random() * (ANCHO - 100);
                     const y = 50 + Math.random() * (ALTO - 150);
@@ -1865,7 +2150,6 @@
                     ctx.fillRect(p.x + 5, p.y + 2, p.w - 10, 3);
                 }
 
-                // Dibujar granadas en el suelo
                 for (const g of this.granadasSuelo) {
                     if (!g.activo) continue;
                     ctx.shadowColor = '#FFD700';
@@ -1882,7 +2166,6 @@
                     ctx.textBaseline = 'middle';
                     ctx.shadowBlur = 0;
                     ctx.fillText('💣', g.x, g.y);
-                    // Brillo
                     ctx.shadowColor = 'rgba(255,215,0,0.3)';
                     ctx.shadowBlur = 30;
                     ctx.beginPath();
@@ -1912,6 +2195,10 @@
                     bala.dibujar();
                 }
 
+                if (this.perro && this.perro.vivo) {
+                    this.perro.dibujar();
+                }
+
                 dibujarParticulas();
 
                 if (this.jugador.vivo) {
@@ -1928,7 +2215,7 @@
 
                 ctx.fillStyle = 'rgba(0,0,0,0.7)';
                 ctx.beginPath();
-                ctx.roundRect(10, 10, 280, 80, 10);
+                ctx.roundRect(10, 10, 310, 80, 10);
                 ctx.fill();
 
                 ctx.textAlign = 'left';
@@ -1963,13 +2250,32 @@
 
                 ctx.fillStyle = '#FF6B6B';
                 ctx.font = '14px Arial';
-                ctx.fillText(`💣 ${this.jugador.granadas}`, 180, 70);
+                ctx.fillText(`💣 ${this.jugador.granadas}`, 190, 70);
+
+                if (this.perro && this.perro.vivo) {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.font = '14px Arial';
+                    ctx.fillText(`🐕‍🦺 REX`, 260, 70);
+                }
 
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = 'rgba(255,215,0,0.5)';
                 ctx.font = '14px Arial';
                 ctx.fillText(`🏆 Récord: ${puntajeMaximo}`, ANCHO - 20, 15);
+
+                // Botón de música en el canvas (PC)
+                if (!esMovil) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                    ctx.beginPath();
+                    ctx.roundRect(ANCHO - 160, 35, 140, 30, 15);
+                    ctx.fill();
+                    ctx.fillStyle = musicaActiva ? '#4CAF50' : '#f44336';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(musicaActiva ? '🔊 Música ON' : '🔇 Música OFF', ANCHO - 90, 50);
+                }
             }
 
             buclePrincipal() {
@@ -2160,6 +2466,9 @@
                     ctx.fillStyle = 'rgba(255,255,255,0.2)';
                     ctx.font = '12px Arial';
                     ctx.fillText('📱 Toca la pantalla para apuntar y disparar', ANCHO / 2, 460);
+                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                    ctx.font = '12px Arial';
+                    ctx.fillText('🐕‍🦺 Perro policía (Rex) aparece a los 3 minutos', ANCHO / 2, 490);
 
                     ctx.fillStyle = 'rgba(255,255,255,0.15)';
                     ctx.font = '12px Arial';
@@ -2210,6 +2519,9 @@
                 return this;
             };
         }
+
+        // ==================== INICIAR MUSICA ====================
+        iniciarMusica();
 
         // ==================== INICIAR JUEGO ====================
         const juegoInicial = new Juego();
