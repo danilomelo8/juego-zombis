@@ -334,7 +334,6 @@
                 if (teclas['ArrowLeft'] || teclas['a']) dx = -this.velocidad;
                 if (teclas['ArrowRight'] || teclas['d']) dx = this.velocidad;
 
-                // Dirección basada en el mouse
                 const anguloMouse = Math.atan2(mouseY - this.centroY, mouseX - this.centroX);
                 this.anguloArma = anguloMouse;
                 if (Math.abs(anguloMouse) < Math.PI / 2) {
@@ -346,12 +345,10 @@
                 this.velX = dx;
                 this.x += this.velX;
 
-                // Gravedad
                 this.velY += 0.5;
                 if (this.velY > 12) this.velY = 12;
                 this.y += this.velY;
 
-                // Colisión con plataformas
                 this.enSuelo = false;
                 for (const p of PLATAFORMAS) {
                     if (this.velY >= 0 &&
@@ -364,7 +361,6 @@
                     }
                 }
 
-                // Colisión con el suelo
                 if (this.y + this.alto >= ALTO - 50) {
                     this.y = ALTO - 50 - this.alto;
                     this.velY = 0;
@@ -372,10 +368,8 @@
                     this.saltosRestantes = 2;
                 }
 
-                // Límites laterales
                 this.x = Math.max(0, Math.min(ANCHO - this.ancho, this.x));
 
-                // Animación
                 if (Math.abs(this.velX) > 0.5) {
                     this.tiempoAnimacion += 0.15;
                     if (this.tiempoAnimacion > 1) {
@@ -389,7 +383,6 @@
 
                 if (this.invulnerable > 0) this.invulnerable--;
                 
-                // Recarga de metralleta
                 if (this.recargando) {
                     this.tiempoRecarga++;
                     if (this.tiempoRecarga > 60) {
@@ -446,7 +439,6 @@
                 const armas = ['pistola', 'escopeta', 'metralleta'];
                 const idx = armas.indexOf(this.arma_actual);
                 let nuevaIdx = (idx + 1) % armas.length;
-                // Si no tiene balas de escopeta o metralleta, saltar
                 while ((armas[nuevaIdx] === 'escopeta' && this.balas_escopeta === 0) ||
                        (armas[nuevaIdx] === 'metralleta' && this.balas_metralleta === 0)) {
                     nuevaIdx = (nuevaIdx + 1) % armas.length;
@@ -484,186 +476,321 @@
                 ctx.shadowBlur = 15;
                 ctx.shadowOffsetY = 5;
 
-                // Cuerpo - Diferenciación clara entre hombre y mujer
+                // ===== CUERPO =====
                 if (this.genero === 'hombre') {
-                    // Hombre - Cuerpo más cuadrado y ancho
+                    // Hombre - Cuerpo atlético
                     const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
                     grad.addColorStop(0, '#1a237e');
                     grad.addColorStop(0.5, '#283593');
                     grad.addColorStop(1, '#1a237e');
                     ctx.fillStyle = grad;
                     ctx.shadowBlur = 10;
-                    ctx.fillRect(x + 3, y + 10, 24, 28);
+                    // Torso
+                    ctx.beginPath();
+                    ctx.roundRect(x + 3, y + 12, 24, 24, 3);
+                    ctx.fill();
+                    
+                    // Músculos (pectorales)
+                    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                    ctx.beginPath();
+                    ctx.arc(x + 10, y + 18, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + 20, y + 18, 5, 0, Math.PI * 2);
+                    ctx.fill();
                     
                     // Cinturón
                     ctx.fillStyle = '#4a2c0a';
                     ctx.fillRect(x + 3, y + 32, 24, 4);
+                    ctx.fillStyle = '#FFD700';
+                    ctx.fillRect(x + 12, y + 32, 6, 4);
                     
-                    // Hombros más anchos
+                    // Hombros anchos
                     ctx.fillStyle = '#1a237e';
-                    ctx.fillRect(x + 1, y + 12, 5, 8);
-                    ctx.fillRect(x + 24, y + 12, 5, 8);
+                    ctx.fillRect(x, y + 14, 5, 8);
+                    ctx.fillRect(x + 25, y + 14, 5, 8);
                 } else {
-                    // Mujer - Cuerpo más estilizado y curvas
-                    // Vestido
+                    // Mujer - Cuerpo estilizado
                     const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
                     grad.addColorStop(0, '#4a148c');
-                    grad.addColorStop(0.5, '#6a1b9a');
+                    grad.addColorStop(0.5, '#7b1fa2');
                     grad.addColorStop(1, '#4a148c');
                     ctx.fillStyle = grad;
                     ctx.shadowBlur = 10;
-                    // Cuerpo más delgado
-                    ctx.fillRect(x + 5, y + 10, 20, 22);
                     
-                    // Vestido - forma de falda
+                    // Torso más delgado
+                    ctx.beginPath();
+                    ctx.roundRect(x + 5, y + 12, 20, 20, 4);
+                    ctx.fill();
+                    
+                    // Pecho (sutil)
+                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                    ctx.beginPath();
+                    ctx.arc(x + 11, y + 18, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + 19, y + 18, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Vestido - falda
                     ctx.fillStyle = '#6a1b9a';
                     ctx.beginPath();
-                    ctx.moveTo(x + 2, y + 32);
-                    ctx.lineTo(x + 28, y + 32);
-                    ctx.lineTo(x + 30, y + 40);
-                    ctx.lineTo(x + 0, y + 40);
+                    ctx.moveTo(x + 4, y + 32);
+                    ctx.quadraticCurveTo(x + 15, y + 38, x + 26, y + 32);
+                    ctx.lineTo(x + 28, y + 42);
+                    ctx.quadraticCurveTo(x + 15, y + 46, x + 2, y + 42);
                     ctx.closePath();
                     ctx.fill();
                     
-                    // Cintura más marcada
+                    // Cintura marcada
                     ctx.fillStyle = '#4a148c';
                     ctx.fillRect(x + 8, y + 28, 14, 3);
                     
-                    // Pecho (sutil)
-                    ctx.fillStyle = '#7c4dff';
-                    ctx.beginPath();
-                    ctx.arc(x + 11, y + 16, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(x + 19, y + 16, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Hombros más estrechos
+                    // Hombros estrechos
                     ctx.fillStyle = '#4a148c';
-                    ctx.fillRect(x + 3, y + 12, 4, 6);
-                    ctx.fillRect(x + 23, y + 12, 4, 6);
+                    ctx.fillRect(x + 2, y + 14, 4, 6);
+                    ctx.fillRect(x + 24, y + 14, 4, 6);
                 }
 
                 ctx.shadowBlur = 0;
 
-                // Cabeza
+                // ===== CABEZA =====
                 ctx.fillStyle = C.PIEL;
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2, y + 10, 12, 0, Math.PI * 2);
+                ctx.arc(x + this.ancho / 2, y + 9, 12, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.strokeStyle = 'rgba(0,0,0,0.15)';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // Pelo - Diferenciación clara
+                // ===== PELO =====
                 if (this.genero === 'hombre') {
-                    // Pelo corto masculino
-                    ctx.fillStyle = '#1a1a1a';
+                    // Pelo corto y prolijo
+                    ctx.fillStyle = '#2c1810';
+                    // Parte superior
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2, y + 5, 13, 0, Math.PI);
+                    ctx.arc(x + this.ancho / 2, y + 4, 13, -Math.PI, 0);
                     ctx.fill();
-                    ctx.fillRect(x + 4, y + 1, 22, 5);
-                    // Barba (opcional)
-                    ctx.fillStyle = 'rgba(30,30,30,0.3)';
-                    ctx.fillRect(x + 8, y + 16, 14, 4);
+                    // Lado izquierdo
+                    ctx.beginPath();
+                    ctx.arc(x + 8, y + 6, 8, Math.PI * 0.5, Math.PI * 1.5);
+                    ctx.fill();
+                    // Lado derecho
+                    ctx.beginPath();
+                    ctx.arc(x + 22, y + 6, 8, -Math.PI * 0.5, Math.PI * 0.5);
+                    ctx.fill();
+                    // Flequillo
+                    ctx.fillRect(x + 5, y + 2, 20, 4);
+                    
+                    // ===== ANTEOJOS NEGROS =====
+                    ctx.strokeStyle = '#1a1a1a';
+                    ctx.lineWidth = 2;
+                    // Marco izquierdo
+                    ctx.beginPath();
+                    ctx.arc(x + 10, y + 8, 6, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Marco derecho
+                    ctx.beginPath();
+                    ctx.arc(x + 20, y + 8, 6, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Puente
+                    ctx.beginPath();
+                    ctx.moveTo(x + 14, y + 8);
+                    ctx.lineTo(x + 16, y + 8);
+                    ctx.stroke();
+                    // Patillas
+                    ctx.beginPath();
+                    ctx.moveTo(x + 6, y + 8);
+                    ctx.lineTo(x + 4, y + 12);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x + 24, y + 8);
+                    ctx.lineTo(x + 26, y + 12);
+                    ctx.stroke();
+                    // Lentes oscuros
+                    ctx.fillStyle = 'rgba(20,20,20,0.7)';
+                    ctx.beginPath();
+                    ctx.arc(x + 10, y + 8, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + 20, y + 8, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Reflejo en lentes
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.beginPath();
+                    ctx.arc(x + 8, y + 6, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x + 18, y + 6, 2, 0, Math.PI * 2);
+                    ctx.fill();
                 } else {
-                    // Pelo largo femenino
-                    ctx.fillStyle = '#8B4513';
-                    // Pelo largo cayendo
-                    for (let i = -2; i <= 2; i += 0.8) {
-                        ctx.beginPath();
-                        ctx.moveTo(x + this.ancho / 2 + i * 6, y + 4);
-                        ctx.quadraticCurveTo(
-                            x + this.ancho / 2 + i * 12 + (i > 0 ? 8 : -8),
-                            y + 20 + Math.abs(i) * 4,
-                            x + this.ancho / 2 + i * 14 + (i > 0 ? 12 : -12),
-                            y + 32 + Math.abs(i) * 6
-                        );
-                        ctx.lineWidth = 3 + Math.abs(i) * 1.5;
-                        ctx.stroke();
-                    }
-                    // Moño
-                    ctx.fillStyle = '#6B3410';
+                    // ===== MUJER - PELO LARGO PROLIJO =====
+                    // Color de pelo (castaño claro)
+                    ctx.fillStyle = '#8D6E63';
+                    
+                    // Pelo principal - caída suave
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2 + 12 * dir, y + 2, 5, 0, Math.PI * 2);
+                    ctx.moveTo(x + 6, y + 4);
+                    ctx.quadraticCurveTo(x + 2, y + 12, x + 4, y + 28);
+                    ctx.quadraticCurveTo(x + 8, y + 32, x + 12, y + 28);
+                    ctx.quadraticCurveTo(x + 10, y + 16, x + 6, y + 4);
                     ctx.fill();
-                    ctx.fillRect(x + this.ancho / 2 + 10 * dir, y - 2, 4, 8);
-                    // Lazo
-                    ctx.fillStyle = '#FF6B9D';
+                    
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2 + 14 * dir, y, 3, 0, Math.PI * 2);
+                    ctx.moveTo(x + 24, y + 4);
+                    ctx.quadraticCurveTo(x + 28, y + 12, x + 26, y + 28);
+                    ctx.quadraticCurveTo(x + 22, y + 32, x + 18, y + 28);
+                    ctx.quadraticCurveTo(x + 20, y + 16, x + 24, y + 4);
+                    ctx.fill();
+                    
+                    // Pelo trasero
+                    ctx.beginPath();
+                    ctx.moveTo(x + 4, y + 6);
+                    ctx.quadraticCurveTo(x + 2, y + 20, x + 6, y + 34);
+                    ctx.quadraticCurveTo(x + 10, y + 38, x + 14, y + 34);
+                    ctx.quadraticCurveTo(x + 12, y + 22, x + 4, y + 6);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x + 26, y + 6);
+                    ctx.quadraticCurveTo(x + 28, y + 20, x + 24, y + 34);
+                    ctx.quadraticCurveTo(x + 20, y + 38, x + 16, y + 34);
+                    ctx.quadraticCurveTo(x + 18, y + 22, x + 26, y + 6);
+                    ctx.fill();
+                    
+                    // Parte superior del pelo
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2, y + 2, 14, -Math.PI, 0);
+                    ctx.fill();
+                    
+                    // Moño elegante
+                    ctx.fillStyle = '#6D4C41';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2 + 12 * dir, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Lazo decorativo
+                    ctx.fillStyle = '#E91E63';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2 + 14 * dir, y - 2, 3, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2 + 10 * dir, y, 3, 0, Math.PI * 2);
+                    ctx.arc(x + this.ancho / 2 + 10 * dir, y - 2, 3, 0, Math.PI * 2);
                     ctx.fill();
-                }
-
-                // Ojos
-                const ojoX = x + this.ancho / 2 + (this.mirandoDerecha ? 4 : -4);
-                ctx.fillStyle = C.BLANCO;
-                ctx.beginPath();
-                ctx.arc(ojoX - 4, y + 8, 3.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(ojoX + 4, y + 8, 3.5, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Pestañas (más largas para mujer)
-                ctx.strokeStyle = '#1a1a2e';
-                ctx.lineWidth = 1.5;
-                if (this.genero === 'mujer') {
-                    // Pestañas largas
+                    // Cintas del lazo
+                    ctx.fillRect(x + this.ancho / 2 + 11 * dir, y + 2, 2, 6);
+                    ctx.fillRect(x + this.ancho / 2 + 13 * dir, y + 2, 2, 6);
+                    
+                    // ===== OJOS CON PESTAÑAS LARGAS =====
+                    const ojoX = x + this.ancho / 2 + (this.mirandoDerecha ? 4 : -4);
+                    
+                    // Ojos grandes
+                    ctx.fillStyle = C.BLANCO;
+                    ctx.beginPath();
+                    ctx.arc(ojoX - 4, y + 8, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(ojoX + 4, y + 8, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Iris (ojos cafés)
+                    ctx.fillStyle = '#5D4037';
+                    ctx.beginPath();
+                    ctx.arc(ojoX - 3 + (this.mirandoDerecha ? 1 : -1), y + 9, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(ojoX + 5 + (this.mirandoDerecha ? 1 : -1), y + 9, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Brillo en ojos
+                    ctx.fillStyle = C.BLANCO;
+                    ctx.beginPath();
+                    ctx.arc(ojoX - 4 + (this.mirandoDerecha ? 1 : -1), y + 7, 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(ojoX + 4 + (this.mirandoDerecha ? 1 : -1), y + 7, 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Pestañas largas y definidas
+                    ctx.strokeStyle = '#1a1a2e';
+                    ctx.lineWidth = 1.5;
+                    // Pestañas superiores
                     for (let i = -1; i <= 1; i+=0.5) {
                         ctx.beginPath();
-                        ctx.moveTo(ojoX - 4 + i * 2, y + 6);
-                        ctx.lineTo(ojoX - 4 + i * 3, y + 3);
+                        ctx.moveTo(ojoX - 4 + i * 3, y + 5);
+                        ctx.lineTo(ojoX - 4 + i * 4, y + 2);
                         ctx.stroke();
                         ctx.beginPath();
-                        ctx.moveTo(ojoX + 4 + i * 2, y + 6);
-                        ctx.lineTo(ojoX + 4 + i * 3, y + 3);
+                        ctx.moveTo(ojoX + 4 + i * 3, y + 5);
+                        ctx.lineTo(ojoX + 4 + i * 4, y + 2);
                         ctx.stroke();
                     }
-                }
-                
-                ctx.fillStyle = '#1a1a2e';
-                ctx.beginPath();
-                ctx.arc(ojoX - 3 + (this.mirandoDerecha ? 1 : -1), y + 9, 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(ojoX + 5 + (this.mirandoDerecha ? 1 : -1), y + 9, 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Boca - Diferente para hombre y mujer
-                ctx.strokeStyle = '#5D4037';
-                ctx.lineWidth = 1.5;
-                if (this.genero === 'mujer') {
-                    // Labios más definidos
+                    // Pestañas inferiores
+                    ctx.lineWidth = 1;
+                    for (let i = -0.5; i <= 0.5; i+=0.5) {
+                        ctx.beginPath();
+                        ctx.moveTo(ojoX - 4 + i * 3, y + 11);
+                        ctx.lineTo(ojoX - 4 + i * 4, y + 13);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(ojoX + 4 + i * 3, y + 11);
+                        ctx.lineTo(ojoX + 4 + i * 4, y + 13);
+                        ctx.stroke();
+                    }
+                    
+                    // ===== LABIOS =====
                     ctx.fillStyle = '#E57373';
                     ctx.beginPath();
                     ctx.arc(x + this.ancho / 2, y + 15, 4, 0, Math.PI);
                     ctx.fill();
-                    ctx.strokeStyle = '#5D4037';
+                    // Brillo en labios
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2 - 1, y + 13, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Línea de labios
+                    ctx.strokeStyle = '#C62828';
                     ctx.lineWidth = 1;
                     ctx.beginPath();
                     ctx.moveTo(x + this.ancho / 2 - 4, y + 15);
                     ctx.quadraticCurveTo(x + this.ancho / 2, y + 12, x + this.ancho / 2 + 4, y + 15);
                     ctx.stroke();
-                } else {
-                    // Boca más simple
+                    
+                    // ===== CEJAS ARQUEADAS =====
+                    ctx.strokeStyle = '#5D4037';
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2, y + 15, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+                    ctx.moveTo(x + 8, y + 4);
+                    ctx.quadraticCurveTo(x + 10, y + 2, x + 12, y + 3);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x + 18, y + 4);
+                    ctx.quadraticCurveTo(x + 20, y + 2, x + 22, y + 3);
                     ctx.stroke();
                 }
 
-                // Brazos - Diferentes para hombre y mujer
+                // ===== BOCA (común para ambos, pero con variación) =====
+                if (this.genero === 'hombre') {
+                    // Boca masculina simple
+                    ctx.strokeStyle = '#5D4037';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(x + this.ancho / 2, y + 16, 3.5, 0.1 * Math.PI, 0.9 * Math.PI);
+                    ctx.stroke();
+                }
+
+                // ===== BRAZOS =====
                 ctx.fillStyle = C.PIEL;
                 const brazoY = y + 18;
                 const brazoX = x + (this.mirandoDerecha ? this.ancho : -8);
                 if (this.genero === 'hombre') {
-                    // Brazos más gruesos
                     ctx.fillRect(brazoX - 4, brazoY, 8, 14);
+                    // Músculo
+                    ctx.fillStyle = 'rgba(255,200,150,0.2)';
+                    ctx.beginPath();
+                    ctx.arc(brazoX + (this.mirandoDerecha ? 0 : 4), brazoY + 4, 4, 0, Math.PI * 2);
+                    ctx.fill();
                 } else {
-                    // Brazos más delgados
                     ctx.fillRect(brazoX - 3, brazoY, 6, 14);
                 }
 
@@ -672,7 +799,7 @@
                 const manoY = brazoY + 12;
                 this.dibujarArma(manoX, manoY);
 
-                // Piernas - Diferentes para hombre y mujer
+                // ===== PIERNAS =====
                 if (this.genero === 'hombre') {
                     ctx.fillStyle = '#1a237e';
                 } else {
@@ -683,24 +810,22 @@
                 const offset2 = Math.sin(paso + Math.PI) * 3;
                 
                 if (this.genero === 'hombre') {
-                    // Piernas más gruesas
                     ctx.fillRect(x + 4, y + 38, 8, 12 + offset1);
                     ctx.fillRect(x + 18, y + 38, 8, 12 + offset2);
                 } else {
-                    // Piernas más delgadas con vestido
-                    ctx.fillRect(x + 5, y + 38, 6, 12 + offset1);
-                    ctx.fillRect(x + 19, y + 38, 6, 12 + offset2);
+                    ctx.fillRect(x + 6, y + 38, 6, 12 + offset1);
+                    ctx.fillRect(x + 18, y + 38, 6, 12 + offset2);
                 }
 
                 // Zapatos
                 ctx.fillStyle = '#4E342E';
                 if (this.genero === 'mujer') {
-                    // Tacones (sutil)
-                    ctx.fillRect(x + 3, y + 50 + offset1, 10, 4);
-                    ctx.fillRect(x + 17, y + 50 + offset2, 10, 4);
+                    // Tacón elegante
+                    ctx.fillRect(x + 4, y + 50 + offset1, 9, 4);
+                    ctx.fillRect(x + 17, y + 50 + offset2, 9, 4);
                     // Tacón
-                    ctx.fillRect(x + 1, y + 52 + offset1, 4, 3);
-                    ctx.fillRect(x + 25, y + 52 + offset2, 4, 3);
+                    ctx.fillRect(x + 2, y + 52 + offset1, 4, 4);
+                    ctx.fillRect(x + 24, y + 52 + offset2, 4, 4);
                 } else {
                     ctx.fillRect(x + 3, y + 50 + offset1, 10, 4);
                     ctx.fillRect(x + 17, y + 50 + offset2, 10, 4);
@@ -761,7 +886,7 @@
 
             dibujarCorazones() {
                 const startX = this.x - 10;
-                const startY = this.y - 25;
+                const startY = this.y - 28;
                 const spacing = 20;
                 
                 for (let i = 0; i < this.maxCorazones; i++) {
@@ -1013,7 +1138,6 @@
             constructor(x, y, angulo) {
                 this.x = x;
                 this.y = y;
-                // Velocidad reducida a la mitad
                 this.vx = Math.cos(angulo) * 3;
                 this.vy = Math.sin(angulo) * 3 - 2;
                 this.radio = 10;
@@ -1058,7 +1182,6 @@
                 }
             }
 
-            // Verificar colisión con zombi (explosión al contacto)
             colisionaCon(zombi) {
                 if (this.exploto) return false;
                 const dist = distancia(this.x, this.y, zombi.centroX, zombi.centroY);
@@ -1360,7 +1483,6 @@
                 this.jugador.mover(this.teclas, this.mouseX, this.mouseY);
                 this.disparoCooldown = Math.max(0, this.disparoCooldown - 1);
 
-                // Actualizar balas del jugador
                 for (let i = this.balas.length - 1; i >= 0; i--) {
                     const bala = this.balas[i];
                     bala.mover();
@@ -1369,7 +1491,6 @@
                     }
                 }
 
-                // Actualizar balas enemigas
                 for (let i = this.balasEnemigas.length - 1; i >= 0; i--) {
                     const bala = this.balasEnemigas[i];
                     bala.mover();
@@ -1389,12 +1510,10 @@
                     }
                 }
 
-                // Actualizar granadas
                 for (let i = this.granadas.length - 1; i >= 0; i--) {
                     const granada = this.granadas[i];
                     granada.mover();
                     
-                    // Verificar colisión con zombis (explosión al contacto)
                     if (!granada.exploto) {
                         for (const zombi of this.zombis) {
                             if (granada.colisionaCon(zombi)) {
@@ -1429,7 +1548,6 @@
                     }
                 }
 
-                // Actualizar zombis
                 for (let i = this.zombis.length - 1; i >= 0; i--) {
                     const zombi = this.zombis[i];
                     zombi.moverHacia(this.jugador);
