@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Zombie Survivor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zombie Survival</title>
     <style>
         * {
             margin: 0;
@@ -16,8 +16,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            user-select: none;
+            font-family: Arial, sans-serif;
             overflow: hidden;
             touch-action: none;
             width: 100vw;
@@ -28,157 +27,28 @@
         }
         #gameContainer {
             position: relative;
-            touch-action: none;
             width: 100vw;
             height: 100vh;
             overflow: hidden;
         }
         canvas {
             display: block;
-            background: #1a1a2e;
-            touch-action: none;
             width: 100% !important;
             height: 100% !important;
+            background: #1a1a2e;
         }
-        
-        #mobileControls {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            display: none;
-            justify-content: space-between;
-            padding: 0 10px;
-            z-index: 15;
-            pointer-events: none;
-            height: 200px;
-            align-items: flex-end;
-        }
-        
-        #joystickZone {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.08);
-            border: 2px solid rgba(255,255,255,0.15);
-            touch-action: none;
-            pointer-events: all;
-            z-index: 20;
-            display: none;
-        }
-        #joystickKnob {
-            position: absolute;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-            border: 2px solid rgba(255,255,255,0.25);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-        
-        #actionButtons {
-            position: absolute;
-            bottom: 20px;
-            right: 15px;
-            display: none;
-            gap: 10px;
-            flex-direction: column;
-            align-items: center;
-            z-index: 20;
-            pointer-events: none;
-        }
-        #actionButtons .btn-row {
-            display: flex;
-            gap: 10px;
-            pointer-events: none;
-        }
-        #actionButtons button {
-            pointer-events: all;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(4px);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            color: white;
-            font-size: 1.2rem;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            min-width: 50px;
-            min-height: 50px;
-        }
-        #actionButtons button:active {
-            background: rgba(255,255,255,0.35);
-            transform: scale(0.9);
-        }
-        #actionButtons .btn-shoot {
-            background: rgba(255,50,50,0.3);
-            border-color: rgba(255,50,50,0.5);
-            width: 70px;
-            height: 70px;
-            font-size: 1.6rem;
-        }
-        #actionButtons .btn-grenade {
-            background: rgba(255,200,50,0.25);
-            border-color: rgba(255,200,50,0.4);
-        }
-        #actionButtons .btn-jump {
-            background: rgba(50,200,50,0.25);
-            border-color: rgba(50,200,50,0.4);
-        }
-        #actionButtons .btn-switch {
-            background: rgba(50,150,255,0.25);
-            border-color: rgba(50,150,255,0.4);
-            font-size: 0.9rem;
-        }
-        
         #musicToggle {
             position: absolute;
             top: 10px;
             right: 10px;
-            z-index: 20;
+            z-index: 10;
             background: rgba(0,0,0,0.6);
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
             cursor: pointer;
-            backdrop-filter: blur(4px);
-            pointer-events: all;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            #mobileControls { display: flex !important; }
-            #joystickZone { display: block !important; }
-            #actionButtons { display: flex !important; }
-            #musicToggle { display: block !important; font-size: 12px; padding: 4px 8px; top: 5px; right: 5px; }
-            #actionButtons button { width: 50px; height: 50px; font-size: 1rem; }
-            #actionButtons .btn-shoot { width: 60px; height: 60px; font-size: 1.4rem; }
-            #joystickZone { width: 110px; height: 110px; bottom: 15px; left: 15px; }
-            #joystickKnob { width: 45px; height: 45px; }
-        }
-        @media (max-width: 480px) {
-            #actionButtons button { width: 42px; height: 42px; font-size: 0.8rem; min-width: 35px; min-height: 35px; }
-            #actionButtons .btn-shoot { width: 52px; height: 52px; font-size: 1.2rem; }
-            #joystickZone { width: 90px; height: 90px; bottom: 10px; left: 10px; }
-            #joystickKnob { width: 38px; height: 38px; }
-            #actionButtons { bottom: 10px; right: 8px; gap: 6px; }
-            #actionButtons .btn-row { gap: 6px; }
         }
     </style>
 </head>
@@ -186,134 +56,48 @@
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         <button id="musicToggle">🔊 Música</button>
-        
-        <div id="joystickZone">
-            <div id="joystickKnob"></div>
-        </div>
-        
-        <div id="actionButtons">
-            <div class="btn-row">
-                <button class="btn-jump" id="btnJump">⬆</button>
-                <button class="btn-grenade" id="btnGrenade">💣</button>
-                <button class="btn-switch" id="btnSwitch">🔄</button>
-            </div>
-            <button class="btn-shoot" id="btnShoot">🔫</button>
-        </div>
     </div>
 
     <script>
-        // ==================== CONFIGURACIÓN ====================
+        // ============================================================
+        // CONFIGURACIÓN INICIAL
+        // ============================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let ANCHO, ALTO, ESCALA;
-        
-        function resizeCanvas() {
-            const container = document.getElementById('gameContainer');
-            ANCHO = container.clientWidth;
-            ALTO = container.clientHeight;
-            canvas.width = ANCHO;
-            canvas.height = ALTO;
-            ESCALA = Math.min(ANCHO / 900, ALTO / 600);
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        let W, H, S;
 
-        // ==================== PLATAFORMAS ====================
-        function getPlataformas() {
-            const e = ESCALA;
-            return [
-                { x: 80*e, y: 460*e, w: 160*e, h: 12*e },
-                { x: 350*e, y: 460*e, w: 160*e, h: 12*e },
-                { x: 620*e, y: 460*e, w: 160*e, h: 12*e },
-                { x: 200*e, y: 350*e, w: 140*e, h: 12*e },
-                { x: 500*e, y: 350*e, w: 140*e, h: 12*e },
-                { x: 80*e, y: 240*e, w: 120*e, h: 12*e },
-                { x: 380*e, y: 240*e, w: 120*e, h: 12*e },
-                { x: 680*e, y: 240*e, w: 120*e, h: 12*e }
-            ];
+        function resize() {
+            W = window.innerWidth;
+            H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+            S = Math.min(W / 800, H / 600);
         }
+        window.addEventListener('resize', resize);
+        resize();
 
-        // ==================== COLORES ====================
-        const C = {
-            NEGRO: '#000000',
-            BLANCO: '#FFFFFF',
-            ROJO: '#FF1744',
-            VERDE: '#00E676',
-            AZUL: '#2979FF',
-            AMARILLO: '#FFEA00',
-            NARANJA: '#FF9100',
-            ROSA: '#FF4081',
-            GRIS: '#78909C',
-            MORADO: '#7C4DFF',
-            PIEL: '#FFCCBC'
+        // ============================================================
+        // ESTADO DEL JUEGO
+        // ============================================================
+        let juego = {
+            menu: true,
+            jugando: false,
+            gameOver: false,
+            genero: null,
+            puntuacion: 0,
+            tiempo: 0,
+            tiempoInicio: 0,
+            ultimoSpawn: 0,
+            eliminados: 0,
+            record: parseInt(localStorage.getItem('zombieRecord')) || 0
         };
 
-        // ==================== ESTADO GLOBAL ====================
-        let puntajeMaximo = parseInt(localStorage.getItem('zombiePuntajeMaximo')) || 0;
-        let juegoActual = null;
-        let enMenu = true;
-        let esMovil = window.innerWidth <= 768;
+        // ============================================================
+        // MUSICA
+        // ============================================================
         let musicaActiva = true;
         let audioCtx = null;
         let musicaInterval = null;
-        let joystickX = 0;
-        let joystickY = 0;
-        let mouseX = 0;
-        let mouseY = 0;
-
-        // ==================== MUSICA ====================
-        function iniciarMusica() {
-            if (!musicaActiva) return;
-            try {
-                if (audioCtx) {
-                    try { audioCtx.close(); } catch(e) {}
-                }
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                function tocarNota(frec, duracion, volumen = 0.06) {
-                    if (!audioCtx || !musicaActiva) return;
-                    try {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        osc.type = 'sawtooth';
-                        osc.frequency.value = frec;
-                        gain.gain.value = volumen;
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duracion);
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.start();
-                        osc.stop(audioCtx.currentTime + duracion);
-                    } catch(e) {}
-                }
-
-                if (musicaInterval) clearInterval(musicaInterval);
-                musicaInterval = setInterval(() => {
-                    if (!musicaActiva || !juegoActual || juegoActual.juegoTerminado) return;
-                    const notas = [180, 220, 260, 300, 340, 380, 420];
-                    const nota = notas[Math.floor(Math.random() * notas.length)];
-                    const duracion = 0.15 + Math.random() * 0.25;
-                    const vol = 0.03 + Math.random() * 0.05;
-                    tocarNota(nota, duracion, vol);
-                    
-                    if (Math.random() > 0.5) {
-                        setTimeout(() => {
-                            tocarNota(nota * 1.25, duracion * 0.5, vol * 0.6);
-                        }, 80 + Math.random() * 120);
-                    }
-                }, 500 + Math.random() * 300);
-            } catch(e) {}
-        }
-
-        function detenerMusica() {
-            if (musicaInterval) {
-                clearInterval(musicaInterval);
-                musicaInterval = null;
-            }
-            if (audioCtx) {
-                try { audioCtx.close(); } catch(e) {}
-                audioCtx = null;
-            }
-        }
 
         function toggleMusica() {
             musicaActiva = !musicaActiva;
@@ -323,32 +107,86 @@
         }
         document.getElementById('musicToggle').addEventListener('click', toggleMusica);
 
-        // ==================== UTILIDADES ====================
-        function distancia(x1, y1, x2, y2) {
-            return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        function iniciarMusica() {
+            if (!musicaActiva) return;
+            try {
+                if (audioCtx) audioCtx.close();
+                audioCtx = new AudioContext();
+                musicaInterval = setInterval(() => {
+                    if (!musicaActiva || juego.gameOver || juego.menu) return;
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.value = 180 + Math.random() * 200;
+                        gain.gain.value = 0.03 + Math.random() * 0.04;
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.2);
+                    } catch(e) {}
+                }, 500 + Math.random() * 400);
+            } catch(e) {}
         }
 
-        function aleatorio(min, max) {
+        function detenerMusica() {
+            if (musicaInterval) { clearInterval(musicaInterval);
+                musicaInterval = null; }
+            if (audioCtx) { try { audioCtx.close(); } catch(e) {}
+                audioCtx = null; }
+        }
+
+        // ============================================================
+        // PLATAFORMAS (escaladas)
+        // ============================================================
+        function getPlataformas() {
+            const s = S;
+            return [
+                { x: 80 * s, y: 460 * s, w: 150 * s, h: 10 * s },
+                { x: 350 * s, y: 460 * s, w: 150 * s, h: 10 * s },
+                { x: 600 * s, y: 460 * s, w: 150 * s, h: 10 * s },
+                { x: 200 * s, y: 350 * s, w: 130 * s, h: 10 * s },
+                { x: 480 * s, y: 350 * s, w: 130 * s, h: 10 * s },
+                { x: 80 * s, y: 240 * s, w: 110 * s, h: 10 * s },
+                { x: 350 * s, y: 240 * s, w: 110 * s, h: 10 * s },
+                { x: 620 * s, y: 240 * s, w: 110 * s, h: 10 * s }
+            ];
+        }
+
+        // ============================================================
+        // UTILIDADES
+        // ============================================================
+        function dist(a, b) {
+            return Math.hypot(a.x - b.x, a.y - b.y);
+        }
+
+        function rand(min, max) {
             return Math.random() * (max - min) + min;
         }
 
-        // ==================== PARTÍCULAS ====================
+        function randInt(min, max) {
+            return Math.floor(rand(min, max + 1));
+        }
+
+        // ============================================================
+        // PARTÍCULAS
+        // ============================================================
         let particulas = [];
 
-        function crearParticulas(x, y, color, cantidad = 10, velocidad = 3) {
-            const e = ESCALA;
-            for (let i = 0; i < cantidad; i++) {
-                const angulo = Math.random() * Math.PI * 2;
-                const vel = (1 + Math.random() * velocidad) * e;
+        function crearParticulas(x, y, color, n = 10, vel = 3) {
+            for (let i = 0; i < n; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const v = (1 + Math.random() * vel) * S;
                 particulas.push({
-                    x: x,
-                    y: y,
-                    dx: Math.cos(angulo) * vel,
-                    dy: Math.sin(angulo) * vel - 1*e,
+                    x,
+                    y,
+                    dx: Math.cos(a) * v,
+                    dy: Math.sin(a) * v - S,
                     vida: 20 + Math.random() * 20,
-                    vidaMax: 40,
-                    radio: (2 + Math.random() * 4) * e,
-                    color: color
+                    maxVida: 40,
+                    radio: (2 + Math.random() * 4) * S,
+                    color
                 });
             }
         }
@@ -358,132 +196,124 @@
                 const p = particulas[i];
                 p.x += p.dx;
                 p.y += p.dy;
-                p.dy += 0.1 * ESCALA;
+                p.dy += 0.1 * S;
                 p.vida--;
-                if (p.vida <= 0) {
-                    particulas.splice(i, 1);
-                }
+                if (p.vida <= 0) particulas.splice(i, 1);
             }
         }
 
         function dibujarParticulas() {
             for (const p of particulas) {
-                const alpha = p.vida / p.vidaMax;
-                ctx.globalAlpha = alpha;
+                const a = p.vida / p.maxVida;
+                ctx.globalAlpha = a;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radio * alpha, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.radio * a, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
                 ctx.fill();
             }
             ctx.globalAlpha = 1;
         }
 
-        // ==================== CLASES ====================
-        class Personaje {
-            constructor(x, y, genero) {
-                const e = ESCALA;
-                this.x = x;
-                this.y = y;
-                this.ancho = 30*e;
-                this.alto = 50*e;
-                this.velX = 0;
-                this.velY = 0;
-                this.velocidad = 4.5 * e;
-                this.fuerzaSalto = -11 * e;
+        // ============================================================
+        // CLASES
+        // ============================================================
+        class Jugador {
+            constructor(genero) {
+                const s = S;
+                this.x = W / 2 - 15 * s;
+                this.y = H - 100 * s;
+                this.w = 30 * s;
+                this.h = 50 * s;
+                this.vx = 0;
+                this.vy = 0;
+                this.speed = 4 * s;
                 this.genero = genero;
                 this.vivo = true;
                 this.enSuelo = false;
-                this.saltosRestantes = 2;
-                this.mirandoDerecha = true;
-                this.arma_actual = 'pistola';
-                this.balas_escopeta = 0;
-                this.balas_metralleta = 30;
-                this.max_metralleta = 30;
-                this.animacionFrame = 0;
-                this.tiempoAnimacion = 0;
-                this.anguloArma = 0;
-                this.corazones = 3;
-                this.maxCorazones = 3;
+                this.saltos = 2;
+                this.vidas = 3;
+                this.maxVidas = 3;
                 this.invulnerable = 0;
+                this.arma = 'pistola';
+                this.balasEscopeta = 0;
+                this.balasMetralleta = 30;
                 this.granadas = 3;
-                this.maxGranadas = 3;
-                this.tiempoRecarga = 0;
+                this.mirando = 1;
+                this.angulo = 0;
+                this.frame = 0;
+                this.tiempoFrame = 0;
                 this.recargando = false;
+                this.tiempoRecarga = 0;
             }
 
-            get centroX() { return this.x + this.ancho / 2; }
-            get centroY() { return this.y + this.alto / 2; }
+            get cx() { return this.x + this.w / 2; }
+            get cy() { return this.y + this.h / 2; }
 
             saltar() {
-                if (this.saltosRestantes > 0) {
-                    this.velY = this.fuerzaSalto;
-                    this.saltosRestantes--;
+                if (this.saltos > 0) {
+                    this.vy = -11 * S;
+                    this.saltos--;
                     this.enSuelo = false;
-                    crearParticulas(this.centroX, this.y + this.alto, C.BLANCO, 8, 2);
+                    crearParticulas(this.cx, this.y + this.h, '#fff', 8, 2);
                 }
             }
 
             mover(teclas, mx, my) {
-                const e = ESCALA;
+                const s = S;
                 const plataformas = getPlataformas();
+
                 let dx = 0;
-                
-                if (teclas['ArrowLeft'] || teclas['a'] || joystickX < -0.3) dx = -this.velocidad;
-                if (teclas['ArrowRight'] || teclas['d'] || joystickX > 0.3) dx = this.velocidad;
-                
-                const anguloMouse = Math.atan2(my - this.centroY, mx - this.centroX);
-                this.anguloArma = anguloMouse;
-                if (Math.abs(anguloMouse) < Math.PI / 2) {
-                    this.mirandoDerecha = true;
-                } else {
-                    this.mirandoDerecha = false;
-                }
+                if (teclas['ArrowLeft'] || teclas['a']) dx = -this.speed;
+                if (teclas['ArrowRight'] || teclas['d']) dx = this.speed;
 
-                this.velX = dx;
-                this.x += this.velX;
+                this.angulo = Math.atan2(my - this.cy, mx - this.cx);
+                this.mirando = Math.abs(this.angulo) < Math.PI / 2 ? 1 : -1;
 
-                this.velY += 0.5 * e;
-                if (this.velY > 12*e) this.velY = 12*e;
-                this.y += this.velY;
+                this.vx = dx;
+                this.x += this.vx;
+
+                this.vy += 0.5 * s;
+                if (this.vy > 12 * s) this.vy = 12 * s;
+                this.y += this.vy;
 
                 this.enSuelo = false;
                 for (const p of plataformas) {
-                    if (this.velY >= 0 &&
-                        this.x + this.ancho > p.x + 5 && this.x < p.x + p.w - 5 &&
-                        this.y + this.alto > p.y && this.y + this.alto < p.y + p.h + 15) {
-                        this.y = p.y - this.alto;
-                        this.velY = 0;
+                    if (this.vy >= 0 &&
+                        this.x + this.w > p.x + 5 && this.x < p.x + p.w - 5 &&
+                        this.y + this.h > p.y && this.y + this.h < p.y + p.h + 15) {
+                        this.y = p.y - this.h;
+                        this.vy = 0;
                         this.enSuelo = true;
-                        this.saltosRestantes = 2;
+                        this.saltos = 2;
                     }
                 }
 
-                if (this.y + this.alto >= ALTO - 50*e) {
-                    this.y = ALTO - 50*e - this.alto;
-                    this.velY = 0;
+                if (this.y + this.h >= H - 50 * s) {
+                    this.y = H - 50 * s - this.h;
+                    this.vy = 0;
                     this.enSuelo = true;
-                    this.saltosRestantes = 2;
+                    this.saltos = 2;
                 }
 
-                this.x = Math.max(0, Math.min(ANCHO - this.ancho, this.x));
+                this.x = Math.max(0, Math.min(W - this.w, this.x));
 
-                if (Math.abs(this.velX) > 0.5*e) {
-                    this.tiempoAnimacion += 0.15;
-                    if (this.tiempoAnimacion > 1) {
-                        this.tiempoAnimacion = 0;
-                        this.animacionFrame = (this.animacionFrame + 1) % 4;
+                if (Math.abs(this.vx) > 0.5 * s) {
+                    this.tiempoFrame += 0.15;
+                    if (this.tiempoFrame > 1) {
+                        this.tiempoFrame = 0;
+                        this.frame = (this.frame + 1) % 4;
                     }
                 } else {
-                    this.animacionFrame = 0;
-                    this.tiempoAnimacion = 0;
+                    this.frame = 0;
+                    this.tiempoFrame = 0;
                 }
 
                 if (this.invulnerable > 0) this.invulnerable--;
-                
+
                 if (this.recargando) {
                     this.tiempoRecarga++;
                     if (this.tiempoRecarga > 60) {
-                        this.balas_metralleta = this.max_metralleta;
+                        this.balasMetralleta = 30;
                         this.recargando = false;
                         this.tiempoRecarga = 0;
                     }
@@ -491,433 +321,286 @@
             }
 
             disparar(mx, my) {
-                if (this.arma_actual === 'pistola') {
-                    const angulo = Math.atan2(my - this.centroY, mx - this.centroX);
-                    const e = ESCALA;
-                    const bala = new Bala(this.centroX + Math.cos(angulo) * 20*e, 
-                                         this.centroY + Math.sin(angulo) * 20*e - 5*e, 
-                                         angulo, 'pistola');
-                    return bala;
-                } else if (this.arma_actual === 'escopeta' && this.balas_escopeta > 0) {
-                    const angulo = Math.atan2(my - this.centroY, mx - this.centroX);
-                    const e = ESCALA;
+                if (this.arma === 'pistola') {
+                    const a = Math.atan2(my - this.cy, mx - this.cx);
+                    return new Bala(this.cx + Math.cos(a) * 20 * S, this.cy + Math.sin(a) * 20 * S - 5 * S, a, 'pistola');
+                } else if (this.arma === 'escopeta' && this.balasEscopeta > 0) {
+                    const a = Math.atan2(my - this.cy, mx - this.cx);
                     const balas = [];
                     for (let i = -3; i <= 3; i++) {
-                        const anguloEscopeta = angulo + (i * 0.08);
-                        balas.push(new Bala(this.centroX + Math.cos(angulo) * 20*e,
-                                           this.centroY + Math.sin(angulo) * 20*e - 5*e,
-                                           anguloEscopeta, 'escopeta'));
+                        balas.push(new Bala(this.cx + Math.cos(a) * 20 * S, this.cy + Math.sin(a) * 20 * S - 5 * S, a + i * 0.08, 'escopeta'));
                     }
-                    this.balas_escopeta--;
-                    if (this.balas_escopeta === 0) {
-                        this.arma_actual = 'pistola';
-                    }
+                    this.balasEscopeta--;
+                    if (this.balasEscopeta === 0) this.arma = 'pistola';
                     return balas;
-                } else if (this.arma_actual === 'metralleta' && this.balas_metralleta > 0) {
-                    const angulo = Math.atan2(my - this.centroY, mx - this.centroX);
-                    const e = ESCALA;
-                    this.balas_metralleta--;
-                    if (this.balas_metralleta === 0) {
-                        this.recargando = true;
-                        this.tiempoRecarga = 0;
-                    }
-                    return [new Bala(this.centroX + Math.cos(angulo) * 20*e,
-                                   this.centroY + Math.sin(angulo) * 20*e - 5*e,
-                                   angulo, 'metralleta')];
+                } else if (this.arma === 'metralleta' && this.balasMetralleta > 0) {
+                    const a = Math.atan2(my - this.cy, mx - this.cx);
+                    this.balasMetralleta--;
+                    if (this.balasMetralleta === 0) { this.recargando = true;
+                        this.tiempoRecarga = 0; }
+                    return [new Bala(this.cx + Math.cos(a) * 20 * S, this.cy + Math.sin(a) * 20 * S - 5 * S, a, 'metralleta')];
                 }
                 return null;
             }
 
             lanzarGranada(mx, my) {
                 if (this.granadas <= 0) return null;
-                const angulo = Math.atan2(my - this.centroY, mx - this.centroX);
+                const a = Math.atan2(my - this.cy, mx - this.cx);
                 this.granadas--;
-                return new Granada(this.centroX, this.centroY, angulo);
+                return new Granada(this.cx, this.cy, a);
             }
 
             cambiarArma() {
                 const armas = ['pistola', 'escopeta', 'metralleta'];
-                const idx = armas.indexOf(this.arma_actual);
-                let nuevaIdx = (idx + 1) % armas.length;
+                let idx = armas.indexOf(this.arma);
+                let nuevo = (idx + 1) % armas.length;
                 let intentos = 0;
-                while ((armas[nuevaIdx] === 'escopeta' && this.balas_escopeta === 0) ||
-                       (armas[nuevaIdx] === 'metralleta' && this.balas_metralleta === 0)) {
-                    nuevaIdx = (nuevaIdx + 1) % armas.length;
+                while ((armas[nuevo] === 'escopeta' && this.balasEscopeta === 0) ||
+                    (armas[nuevo] === 'metralleta' && this.balasMetralleta === 0)) {
+                    nuevo = (nuevo + 1) % armas.length;
                     intentos++;
                     if (intentos > 3) break;
                 }
-                this.arma_actual = armas[nuevaIdx];
+                this.arma = armas[nuevo];
                 this.recargando = false;
                 this.tiempoRecarga = 0;
             }
 
-            recibirDaño(daño) {
+            recibirDaño() {
                 if (this.invulnerable > 0) return false;
-                this.corazones -= daño;
+                this.vidas--;
                 this.invulnerable = 60;
-                crearParticulas(this.centroX, this.centroY, C.ROJO, 20, 5);
-                if (this.corazones <= 0) {
-                    this.corazones = 0;
-                    this.vivo = false;
-                }
+                crearParticulas(this.cx, this.cy, '#ff1744', 20, 5);
+                if (this.vidas <= 0) { this.vidas = 0;
+                    this.vivo = false; }
                 return true;
             }
 
             dibujar() {
-                const e = ESCALA;
-                ctx.save();
-                
+                const s = S;
+                const x = this.x,
+                    y = this.y;
+
                 if (this.invulnerable > 0 && Math.floor(this.invulnerable / 4) % 2 === 0) {
                     ctx.globalAlpha = 0.5;
                 }
 
-                const x = this.x;
-                const y = this.y;
-                const dir = this.mirandoDerecha ? 1 : -1;
-
+                ctx.save();
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 15*e;
-                ctx.shadowOffsetY = 5*e;
+                ctx.shadowBlur = 10 * s;
 
-                if (this.genero === 'hombre') {
-                    const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
-                    grad.addColorStop(0, '#1a237e');
-                    grad.addColorStop(0.5, '#283593');
-                    grad.addColorStop(1, '#1a237e');
-                    ctx.fillStyle = grad;
-                    ctx.shadowBlur = 10*e;
-                    ctx.beginPath();
-                    ctx.roundRect(x + 3*e, y + 12*e, 24*e, 24*e, 3*e);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = 'rgba(255,255,255,0.1)';
-                    ctx.beginPath();
-                    ctx.arc(x + 10*e, y + 18*e, 5*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(x + 20*e, y + 18*e, 5*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = '#4a2c0a';
-                    ctx.fillRect(x + 3*e, y + 32*e, 24*e, 4*e);
-                    ctx.fillStyle = '#FFD700';
-                    ctx.fillRect(x + 12*e, y + 32*e, 6*e, 4*e);
-                    
-                    ctx.fillStyle = '#1a237e';
-                    ctx.fillRect(x, y + 14*e, 5*e, 8*e);
-                    ctx.fillRect(x + 25*e, y + 14*e, 5*e, 8*e);
-                } else {
-                    const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
-                    grad.addColorStop(0, '#4a148c');
-                    grad.addColorStop(0.5, '#7b1fa2');
-                    grad.addColorStop(1, '#4a148c');
-                    ctx.fillStyle = grad;
-                    ctx.shadowBlur = 10*e;
-                    
-                    ctx.beginPath();
-                    ctx.roundRect(x + 5*e, y + 12*e, 20*e, 20*e, 4*e);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                    ctx.beginPath();
-                    ctx.arc(x + 11*e, y + 18*e, 4*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(x + 19*e, y + 18*e, 4*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = '#6a1b9a';
-                    ctx.beginPath();
-                    ctx.moveTo(x + 4*e, y + 32*e);
-                    ctx.quadraticCurveTo(x + 15*e, y + 38*e, x + 26*e, y + 32*e);
-                    ctx.lineTo(x + 28*e, y + 42*e);
-                    ctx.quadraticCurveTo(x + 15*e, y + 46*e, x + 2*e, y + 42*e);
-                    ctx.closePath();
-                    ctx.fill();
-                    
-                    ctx.fillStyle = '#4a148c';
-                    ctx.fillRect(x + 8*e, y + 28*e, 14*e, 3*e);
-                    
-                    ctx.fillStyle = '#4a148c';
-                    ctx.fillRect(x + 2*e, y + 14*e, 4*e, 6*e);
-                    ctx.fillRect(x + 24*e, y + 14*e, 4*e, 6*e);
-                }
+                // Cuerpo
+                const color = this.genero === 'hombre' ? '#1a237e' : '#4a148c';
+                ctx.fillStyle = color;
+                ctx.fillRect(x + 4 * s, y + 12 * s, 22 * s, 24 * s);
 
-                ctx.shadowBlur = 0;
-
-                ctx.fillStyle = C.PIEL;
+                // Cabeza
+                ctx.fillStyle = '#ffccbc';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2, y + 9*e, 12*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2, y + 9 * s, 12 * s, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Pelo
                 if (this.genero === 'hombre') {
                     ctx.fillStyle = '#2c1810';
-                    ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2, y + 4*e, 13*e, -Math.PI, 0);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(x + 8*e, y + 6*e, 8*e, Math.PI * 0.5, Math.PI * 1.5);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(x + 22*e, y + 6*e, 8*e, -Math.PI * 0.5, Math.PI * 0.5);
-                    ctx.fill();
-                    ctx.fillRect(x + 5*e, y + 2*e, 20*e, 4*e);
-                    
+                    ctx.fillRect(x + 4 * s, y + 2 * s, 22 * s, 5 * s);
+                    ctx.fillRect(x + 6 * s, y + 1 * s, 18 * s, 4 * s);
+                    // Anteojos
                     ctx.strokeStyle = '#1a1a1a';
-                    ctx.lineWidth = 2*e;
+                    ctx.lineWidth = 2 * s;
                     ctx.beginPath();
-                    ctx.arc(x + 10*e, y + 8*e, 6*e, 0, Math.PI * 2);
+                    ctx.arc(x + 10 * s, y + 8 * s, 6 * s, 0, Math.PI * 2);
                     ctx.stroke();
                     ctx.beginPath();
-                    ctx.arc(x + 20*e, y + 8*e, 6*e, 0, Math.PI * 2);
+                    ctx.arc(x + 20 * s, y + 8 * s, 6 * s, 0, Math.PI * 2);
                     ctx.stroke();
                     ctx.fillStyle = 'rgba(20,20,20,0.7)';
                     ctx.beginPath();
-                    ctx.arc(x + 10*e, y + 8*e, 5*e, 0, Math.PI * 2);
+                    ctx.arc(x + 10 * s, y + 8 * s, 5 * s, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.arc(x + 20*e, y + 8*e, 5*e, 0, Math.PI * 2);
+                    ctx.arc(x + 20 * s, y + 8 * s, 5 * s, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
                     ctx.fillStyle = '#8D6E63';
                     ctx.beginPath();
-                    ctx.moveTo(x + 6*e, y + 4*e);
-                    ctx.quadraticCurveTo(x + 2*e, y + 12*e, x + 4*e, y + 28*e);
-                    ctx.quadraticCurveTo(x + 8*e, y + 32*e, x + 12*e, y + 28*e);
-                    ctx.quadraticCurveTo(x + 10*e, y + 16*e, x + 6*e, y + 4*e);
+                    ctx.moveTo(x + 4 * s, y + 4 * s);
+                    ctx.quadraticCurveTo(x, y + 16 * s, x + 4 * s, y + 28 * s);
+                    ctx.quadraticCurveTo(x + 8 * s, y + 32 * s, x + 12 * s, y + 28 * s);
                     ctx.fill();
-                    
                     ctx.beginPath();
-                    ctx.moveTo(x + 24*e, y + 4*e);
-                    ctx.quadraticCurveTo(x + 28*e, y + 12*e, x + 26*e, y + 28*e);
-                    ctx.quadraticCurveTo(x + 22*e, y + 32*e, x + 18*e, y + 28*e);
-                    ctx.quadraticCurveTo(x + 20*e, y + 16*e, x + 24*e, y + 4*e);
+                    ctx.moveTo(x + 26 * s, y + 4 * s);
+                    ctx.quadraticCurveTo(x + 30 * s, y + 16 * s, x + 26 * s, y + 28 * s);
+                    ctx.quadraticCurveTo(x + 22 * s, y + 32 * s, x + 18 * s, y + 28 * s);
                     ctx.fill();
-                    
-                    ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2, y + 2*e, 14*e, -Math.PI, 0);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = '#6D4C41';
-                    ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2 + 12*e * dir, y, 5*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    
+                    // Moño
                     ctx.fillStyle = '#E91E63';
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2 + 14*e * dir, y - 2*e, 3*e, 0, Math.PI * 2);
+                    ctx.arc(x + this.w / 2 + 12 * s * this.mirando, y + 2 * s, 4 * s, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Ojos grandes
+                    const ox = x + this.w / 2 + (this.mirando > 0 ? 4 * s : -4 * s);
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(ox - 4 * s, y + 8 * s, 4 * s, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2 + 10*e * dir, y - 2*e, 3*e, 0, Math.PI * 2);
+                    ctx.arc(ox + 4 * s, y + 8 * s, 4 * s, 0, Math.PI * 2);
                     ctx.fill();
-                    
-                    const ojoX = x + this.ancho / 2 + (this.mirandoDerecha ? 4*e : -4*e);
-                    
-                    ctx.fillStyle = C.BLANCO;
-                    ctx.beginPath();
-                    ctx.arc(ojoX - 4*e, y + 8*e, 4*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(ojoX + 4*e, y + 8*e, 4*e, 0, Math.PI * 2);
-                    ctx.fill();
-                    
                     ctx.fillStyle = '#5D4037';
                     ctx.beginPath();
-                    ctx.arc(ojoX - 3*e + (this.mirandoDerecha ? 1*e : -1*e), y + 9*e, 2.5*e, 0, Math.PI * 2);
+                    ctx.arc(ox - 3 * s + this.mirando * s, y + 9 * s, 2.5 * s, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.arc(ojoX + 5*e + (this.mirandoDerecha ? 1*e : -1*e), y + 9*e, 2.5*e, 0, Math.PI * 2);
+                    ctx.arc(ox + 5 * s + this.mirando * s, y + 9 * s, 2.5 * s, 0, Math.PI * 2);
                     ctx.fill();
-                    
                     ctx.fillStyle = '#E57373';
                     ctx.beginPath();
-                    ctx.arc(x + this.ancho / 2, y + 15*e, 4*e, 0, Math.PI);
+                    ctx.arc(x + this.w / 2, y + 15 * s, 4 * s, 0, Math.PI);
                     ctx.fill();
                 }
 
-                ctx.fillStyle = C.PIEL;
-                const brazoY = y + 18*e;
-                const brazoX = x + (this.mirandoDerecha ? this.ancho : -8*e);
-                ctx.fillRect(brazoX - 3*e, brazoY, 6*e, 14*e);
+                ctx.shadowBlur = 0;
 
-                const manoX = brazoX + (this.mirandoDerecha ? 3*e : -3*e);
-                const manoY = brazoY + 12*e;
-                this.dibujarArma(manoX, manoY);
+                // Brazos y arma
+                ctx.fillStyle = '#ffccbc';
+                const by = y + 18 * s;
+                const bx = x + (this.mirando > 0 ? this.w : -8 * s);
+                ctx.fillRect(bx - 3 * s, by, 6 * s, 14 * s);
 
-                ctx.fillStyle = this.genero === 'hombre' ? '#1a237e' : '#4a148c';
-                const paso = this.animacionFrame * 0.3;
-                const offset1 = Math.sin(paso) * 3*e;
-                const offset2 = Math.sin(paso + Math.PI) * 3*e;
-                ctx.fillRect(x + 5*e, y + 38*e, 6*e, 12*e + offset1);
-                ctx.fillRect(x + 19*e, y + 38*e, 6*e, 12*e + offset2);
+                // Arma
+                const mx2 = bx + (this.mirando > 0 ? 3 * s : -3 * s);
+                const my2 = by + 12 * s;
+                ctx.save();
+                ctx.translate(mx2, my2);
+                ctx.rotate(this.angulo * this.mirando);
+                ctx.fillStyle = '#37474F';
+                ctx.shadowBlur = 5 * s;
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(0, -3 * s, 20 * s, 6 * s);
+                if (this.arma === 'escopeta') {
+                    ctx.fillStyle = '#5D4037';
+                    ctx.fillRect(-8 * s, -3 * s, 10 * s, 6 * s);
+                    ctx.fillRect(18 * s, -4 * s, 4 * s, 8 * s);
+                } else if (this.arma === 'metralleta') {
+                    ctx.fillStyle = '#263238';
+                    ctx.fillRect(0, -3 * s, 24 * s, 6 * s);
+                    ctx.fillRect(5 * s, 2 * s, 8 * s, 6 * s);
+                }
+                ctx.restore();
+
+                // Piernas
+                ctx.fillStyle = color;
+                const paso = this.frame * 0.3;
+                ctx.fillRect(x + 4 * s, y + 38 * s, 7 * s, 12 * s + Math.sin(paso) * 3 * s);
+                ctx.fillRect(x + 19 * s, y + 38 * s, 7 * s, 12 * s + Math.sin(paso + Math.PI) * 3 * s);
 
                 ctx.fillStyle = '#4E342E';
-                ctx.fillRect(x + 3*e, y + 50*e + offset1, 10*e, 4*e);
-                ctx.fillRect(x + 17*e, y + 50*e + offset2, 10*e, 4*e);
+                ctx.fillRect(x + 3 * s, y + 50 * s + Math.sin(paso) * 3 * s, 9 * s, 4 * s);
+                ctx.fillRect(x + 18 * s, y + 50 * s + Math.sin(paso + Math.PI) * 3 * s, 9 * s, 4 * s);
 
                 ctx.restore();
 
-                this.dibujarCorazones();
-            }
-
-            dibujarArma(manoX, manoY) {
-                const e = ESCALA;
-                const angulo = this.anguloArma;
-                const largo = 20*e;
-                const dir = this.mirandoDerecha ? 1 : -1;
-
-                ctx.save();
-                ctx.translate(manoX, manoY);
-                ctx.rotate(angulo * dir);
-
-                if (this.arma_actual === 'pistola') {
-                    ctx.fillStyle = '#37474F';
-                    ctx.shadowBlur = 5*e;
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                    ctx.fillRect(0, -3*e, largo, 6*e);
-                    ctx.fillRect(largo - 5*e, -5*e, 5*e, 10*e);
-                    ctx.fillStyle = '#546E7A';
-                    ctx.fillRect(largo - 2*e, -4*e, 4*e, 8*e);
-                } else if (this.arma_actual === 'escopeta') {
-                    ctx.fillStyle = '#5D4037';
-                    ctx.shadowBlur = 5*e;
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                    ctx.fillRect(0, -4*e, largo + 5*e, 8*e);
-                    ctx.fillStyle = '#795548';
-                    ctx.fillRect(largo + 3*e, -5*e, 4*e, 10*e);
-                    ctx.fillStyle = '#4E342E';
-                    ctx.fillRect(-8*e, -3*e, 10*e, 6*e);
-                } else if (this.arma_actual === 'metralleta') {
-                    ctx.fillStyle = '#263238';
-                    ctx.shadowBlur = 5*e;
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                    ctx.fillRect(0, -3*e, largo + 8*e, 6*e);
-                    ctx.fillStyle = '#37474F';
-                    ctx.fillRect(largo + 4*e, -4*e, 6*e, 8*e);
-                    ctx.fillStyle = '#1a1a1a';
-                    ctx.fillRect(5*e, 2*e, 8*e, 6*e);
-                }
-
-                ctx.restore();
-            }
-
-            dibujarCorazones() {
-                const e = ESCALA;
-                const startX = this.x - 10*e;
-                const startY = this.y - 28*e;
-                const spacing = 20*e;
-                
-                for (let i = 0; i < this.maxCorazones; i++) {
-                    const x = startX + i * spacing;
-                    const y = startY;
-                    ctx.font = `${20*e}px Arial`;
+                // Corazones
+                for (let i = 0; i < this.maxVidas; i++) {
+                    ctx.font = `${18*s}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    if (i < this.corazones) {
-                        ctx.fillStyle = '#FF1744';
-                        ctx.shadowColor = '#FF1744';
-                        ctx.shadowBlur = 15*e;
-                        ctx.fillText('❤️', x + 8*e, y + 10*e);
-                    } else {
-                        ctx.fillStyle = '#333';
-                        ctx.shadowBlur = 0;
-                        ctx.fillText('🖤', x + 8*e, y + 10*e);
-                    }
+                    const cx2 = x + i * 20 * s;
+                    const cy2 = y - 25 * s;
+                    ctx.fillStyle = i < this.vidas ? '#ff1744' : '#333';
+                    ctx.shadowColor = i < this.vidas ? '#ff1744' : 'transparent';
+                    ctx.shadowBlur = i < this.vidas ? 10 * s : 0;
+                    ctx.fillText('❤️', cx2 + 8 * s, cy2 + 10 * s);
                 }
                 ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
             }
         }
 
-        // ==================== CLASES DE JUEGO ====================
+        // ============================================================
         class Perro {
             constructor(x, y) {
-                const e = ESCALA;
+                const s = S;
                 this.x = x;
                 this.y = y;
-                this.ancho = 25*e;
-                this.alto = 20*e;
+                this.w = 25 * s;
+                this.h = 20 * s;
                 this.vivo = true;
-                this.velocidad = 3.5 * e;
-                this.tiempoAtaque = 0;
+                this.speed = 3 * s;
                 this.objetivo = null;
-                this.animacionFrame = 0;
-                this.tiempoAnimacion = 0;
-                this.mirandoDerecha = true;
+                this.tiempoAtaque = 0;
+                this.frame = 0;
+                this.tiempoFrame = 0;
+                this.mirando = 1;
             }
 
-            get centroX() { return this.x + this.ancho / 2; }
-            get centroY() { return this.y + this.alto / 2; }
+            get cx() { return this.x + this.w / 2; }
+            get cy() { return this.y + this.h / 2; }
 
-            buscarObjetivo(zombis) {
-                let masCercano = null;
-                let distMinima = Infinity;
+            buscar(zombis) {
+                let mejor = null,
+                    distMin = Infinity;
                 for (const z of zombis) {
-                    if (!z.vida) continue;
-                    const dist = distancia(this.centroX, this.centroY, z.centroX, z.centroY);
-                    if (dist < distMinima && dist < 400*ESCALA) {
-                        distMinima = dist;
-                        masCercano = z;
+                    if (!z.vivo) continue;
+                    const d = dist(this, z);
+                    if (d < distMin && d < 400 * S) {
+                        distMin = d;
+                        mejor = z;
                     }
                 }
-                this.objetivo = masCercano;
+                this.objetivo = mejor;
             }
 
             mover(jugador) {
-                const e = ESCALA;
+                const s = S;
                 const plataformas = getPlataformas();
                 if (!this.vivo) return;
 
-                let dx = 0, dy = 0;
-                if (this.objetivo && this.objetivo.vida) {
-                    dx = this.objetivo.centroX - this.centroX;
-                    dy = this.objetivo.centroY - this.centroY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist > 10*e) {
-                        this.x += (dx / dist) * this.velocidad;
-                        this.y += (dy / dist) * this.velocidad;
-                    }
-                    this.mirandoDerecha = dx > 0;
+                let dx = 0,
+                    dy = 0;
+                if (this.objetivo && this.objetivo.vivo) {
+                    dx = this.objetivo.cx - this.cx;
+                    dy = this.objetivo.cy - this.cy;
+                    const d = Math.hypot(dx, dy);
+                    if (d > 10 * s) { this.x += (dx / d) * this.speed;
+                        this.y += (dy / d) * this.speed; }
+                    this.mirando = dx > 0 ? 1 : -1;
                 } else {
-                    dx = jugador.centroX - this.centroX;
-                    dy = jugador.centroY - this.centroY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist > 60*e) {
-                        this.x += (dx / dist) * this.velocidad * 0.5;
-                        this.y += (dy / dist) * this.velocidad * 0.5;
-                    }
-                    this.mirandoDerecha = dx > 0;
+                    dx = jugador.cx - this.cx;
+                    dy = jugador.cy - this.cy;
+                    const d = Math.hypot(dx, dy);
+                    if (d > 60 * s) { this.x += (dx / d) * this.speed * 0.5;
+                        this.y += (dy / d) * this.speed * 0.5; }
+                    this.mirando = dx > 0 ? 1 : -1;
                 }
 
                 for (const p of plataformas) {
-                    if (this.x + this.ancho > p.x + 2 && this.x < p.x + p.w - 2 &&
-                        this.y + this.alto > p.y && this.y + this.alto < p.y + p.h + 10) {
-                        this.y = p.y - this.alto;
+                    if (this.x + this.w > p.x + 2 && this.x < p.x + p.w - 2 &&
+                        this.y + this.h > p.y && this.y + this.h < p.y + p.h + 10) {
+                        this.y = p.y - this.h;
                     }
                 }
+                if (this.y + this.h >= H - 50 * s) this.y = H - 50 * s - this.h;
 
-                if (this.y + this.alto >= ALTO - 50*e) {
-                    this.y = ALTO - 50*e - this.alto;
-                }
+                this.x = Math.max(0, Math.min(W - this.w, this.x));
+                this.y = Math.max(0, Math.min(H - 50 * s - this.h, this.y));
 
-                this.x = Math.max(0, Math.min(ANCHO - this.ancho, this.x));
-                this.y = Math.max(0, Math.min(ALTO - 50*e - this.alto, this.y));
-
-                this.tiempoAnimacion += 0.15;
-                if (this.tiempoAnimacion > 1) {
-                    this.tiempoAnimacion = 0;
-                    this.animacionFrame = (this.animacionFrame + 1) % 4;
-                }
+                this.tiempoFrame += 0.15;
+                if (this.tiempoFrame > 1) { this.tiempoFrame = 0;
+                    this.frame = (this.frame + 1) % 4; }
                 if (this.tiempoAtaque > 0) this.tiempoAtaque--;
             }
 
             atacar(zombis) {
-                if (this.tiempoAtaque > 0 || !this.objetivo || !this.objetivo.vida) return false;
-                const dist = distancia(this.centroX, this.centroY, this.objetivo.centroX, this.objetivo.centroY);
-                if (dist < 40*ESCALA) {
-                    this.objetivo.recibirDaño(2);
+                if (this.tiempoAtaque > 0 || !this.objetivo || !this.objetivo.vivo) return false;
+                const d = dist(this, this.objetivo);
+                if (d < 40 * S) {
+                    this.objetivo.vida -= 2;
                     this.tiempoAtaque = 30;
-                    crearParticulas(this.objetivo.centroX, this.objetivo.centroY, '#FF6B00', 15, 4);
-                    if (!this.objetivo.vida) {
+                    crearParticulas(this.objetivo.cx, this.objetivo.cy, '#ff6b00', 15, 4);
+                    if (this.objetivo.vida <= 0) {
+                        this.objetivo.vivo = false;
                         this.objetivo = null;
                         return true;
                     }
@@ -926,247 +609,247 @@
             }
 
             dibujar() {
-                const e = ESCALA;
+                const s = S;
                 if (!this.vivo) return;
-                const x = this.x;
-                const y = this.y;
-                const dir = this.mirandoDerecha ? 1 : -1;
+                const x = this.x,
+                    y = this.y;
 
                 ctx.save();
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 8 * s;
 
                 ctx.fillStyle = '#8D6E63';
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 10*e;
                 ctx.beginPath();
-                ctx.roundRect(x + 4*e, y + 6*e, 17*e, 12*e, 4*e);
+                ctx.roundRect(x + 4 * s, y + 6 * s, 17 * s, 12 * s, 4 * s);
                 ctx.fill();
 
                 ctx.fillStyle = '#8D6E63';
-                ctx.shadowBlur = 5*e;
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 6*e : -6*e), y + 6*e, 8*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 6 * s : -6 * s), y + 6 * s, 8 * s, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#6D4C41';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 12*e : -12*e), y + 8*e, 4*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 12 * s : -12 * s), y + 8 * s, 4 * s, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 15*e : -15*e), y + 7*e, 2*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 15 * s : -15 * s), y + 7 * s, 2 * s, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = C.BLANCO;
+                ctx.fillStyle = '#fff';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 8*e : -8*e), y + 4*e, 3*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 8 * s : -8 * s), y + 4 * s, 3 * s, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.fillStyle = '#4a2c0a';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 9*e : -9*e), y + 5*e, 1.5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 9 * s : -9 * s), y + 5 * s, 1.5 * s, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Orejas
                 ctx.fillStyle = '#6D4C41';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? -2*e : 2*e), y + 1*e, 5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? -2 * s : 2 * s), y + 1 * s, 5 * s, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + (this.mirandoDerecha ? 6*e : -6*e), y + 1*e, 5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 6 * s : -6 * s), y + 1 * s, 5 * s, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Collar
                 ctx.fillStyle = '#D32F2F';
-                ctx.fillRect(x + 4*e, y + 10*e, 17*e, 3*e);
+                ctx.fillRect(x + 4 * s, y + 10 * s, 17 * s, 3 * s);
 
+                // Patas
                 ctx.fillStyle = '#6D4C41';
-                const paso = this.animacionFrame * 0.3;
-                ctx.fillRect(x + 3*e, y + 18*e + Math.sin(paso) * 2*e, 4*e, 6*e);
-                ctx.fillRect(x + 9*e, y + 18*e + Math.sin(paso + Math.PI) * 2*e, 4*e, 6*e);
-                ctx.fillRect(x + 15*e, y + 18*e + Math.sin(paso + Math.PI * 0.5) * 2*e, 4*e, 6*e);
+                const paso = this.frame * 0.3;
+                ctx.fillRect(x + 3 * s, y + 18 * s + Math.sin(paso) * 2 * s, 4 * s, 6 * s);
+                ctx.fillRect(x + 9 * s, y + 18 * s + Math.sin(paso + Math.PI) * 2 * s, 4 * s, 6 * s);
+                ctx.fillRect(x + 15 * s, y + 18 * s + Math.sin(paso + Math.PI * 0.5) * 2 * s, 4 * s, 6 * s);
 
+                // Cola
                 ctx.strokeStyle = '#8D6E63';
-                ctx.lineWidth = 3*e;
+                ctx.lineWidth = 3 * s;
+                const cx2 = this.mirando > 0 ? x : x + this.w;
                 ctx.beginPath();
-                const colaX = this.mirandoDerecha ? x : x + this.ancho;
-                ctx.moveTo(colaX, y + 8*e);
-                ctx.quadraticCurveTo(colaX + (this.mirandoDerecha ? -8*e : 8*e), y - 4*e, colaX + (this.mirandoDerecha ? -12*e : 12*e), y - 8*e);
+                ctx.moveTo(cx2, y + 8 * s);
+                ctx.quadraticCurveTo(cx2 + (this.mirando > 0 ? -8 * s : 8 * s), y - 4 * s, cx2 + (this.mirando > 0 ? -12 * s : 12 * s), y - 8 * s);
                 ctx.stroke();
 
+                ctx.shadowBlur = 0;
                 ctx.restore();
 
                 ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = `${8*e}px Arial`;
+                ctx.font = `${8*s}px Arial`;
                 ctx.textAlign = 'center';
-                ctx.fillText('🐕‍🦺 REX', this.centroX, y - 6*e);
+                ctx.fillText('🐕 REX', this.cx, y - 6 * s);
             }
         }
 
+        // ============================================================
         class Zombi {
             constructor(x, y, nivel) {
-                const e = ESCALA;
+                const s = S;
                 this.x = x;
                 this.y = y;
-                this.ancho = 28*e;
-                this.alto = 44*e;
+                this.w = 28 * s;
+                this.h = 44 * s;
                 this.vida = nivel;
                 this.maxVida = nivel;
-                this.velocidad = 1 * e + nivel * 0.15 * e;
+                this.speed = (1 + nivel * 0.15) * s;
                 this.nivel = nivel;
-                this.radio = 16*e;
-                this.tiempoAtaque = 0;
-                this.animacionFrame = 0;
-                this.tiempoAnimacion = 0;
+                this.vivo = true;
                 this.tipo = 'normal';
+                this.dispara = false;
                 this.tiempoDisparo = 0;
-                this.puedeDisparar = false;
+                this.frame = 0;
+                this.tiempoFrame = 0;
             }
 
-            get centroX() { return this.x + this.ancho / 2; }
-            get centroY() { return this.y + this.alto / 2; }
+            get cx() { return this.x + this.w / 2; }
+            get cy() { return this.y + this.h / 2; }
 
             configurar(minutos) {
-                // A partir del minuto 2, algunos zombis disparan
                 if (minutos >= 2) {
                     const prob = Math.min(0.25 + (minutos - 2) * 0.03, 0.45);
-                    this.tipo = Math.random() < prob ? 'disparador' : 'normal';
-                    this.puedeDisparar = this.tipo === 'disparador';
-                    if (this.puedeDisparar) {
-                        this.velocidad *= 0.7;
+                    if (Math.random() < prob) {
+                        this.tipo = 'disparador';
+                        this.dispara = true;
+                        this.speed *= 0.7;
                     }
                 }
             }
 
-            moverHacia(objetivo) {
-                const e = ESCALA;
+            mover(jugador) {
+                const s = S;
                 const plataformas = getPlataformas();
-                const dx = objetivo.centroX - this.centroX;
-                const dy = objetivo.centroY - this.centroY;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (!this.vivo) return;
 
-                if (dist > 20*e) {
-                    const movX = (dx / dist) * this.velocidad;
-                    const movY = (dy / dist) * this.velocidad;
-                    this.x += movX;
-                    this.y += movY;
+                const dx = jugador.cx - this.cx;
+                const dy = jugador.cy - this.cy;
+                const d = Math.hypot(dx, dy);
+
+                if (d > 20 * s) {
+                    this.x += (dx / d) * this.speed;
+                    this.y += (dy / d) * this.speed;
                 }
 
                 for (const p of plataformas) {
-                    if (this.x + this.ancho > p.x + 2 && this.x < p.x + p.w - 2 &&
-                        this.y + this.alto > p.y && this.y + this.alto < p.y + p.h + 10) {
-                        this.y = p.y - this.alto;
+                    if (this.x + this.w > p.x + 2 && this.x < p.x + p.w - 2 &&
+                        this.y + this.h > p.y && this.y + this.h < p.y + p.h + 10) {
+                        this.y = p.y - this.h;
                     }
                 }
 
-                this.x = Math.max(0, Math.min(ANCHO - this.ancho, this.x));
-                this.y = Math.max(0, Math.min(ALTO - 50*e - this.alto, this.y));
+                this.x = Math.max(0, Math.min(W - this.w, this.x));
+                this.y = Math.max(0, Math.min(H - 50 * s - this.h, this.y));
 
-                this.tiempoAnimacion += 0.1;
-                if (this.tiempoAnimacion > 1) {
-                    this.tiempoAnimacion = 0;
-                    this.animacionFrame = (this.animacionFrame + 1) % 4;
-                }
+                this.tiempoFrame += 0.1;
+                if (this.tiempoFrame > 1) { this.tiempoFrame = 0;
+                    this.frame = (this.frame + 1) % 4; }
             }
 
             dibujar() {
-                const e = ESCALA;
-                const x = this.x;
-                const y = this.y;
-                const colores = [C.VERDE, C.NARANJA, C.ROJO, C.MORADO, '#8B0000'];
+                const s = S;
+                if (!this.vivo) return;
+                const x = this.x,
+                    y = this.y;
+                const colores = ['#00E676', '#FF9100', '#FF1744', '#7C4DFF', '#8B0000'];
                 const color = colores[Math.min(this.nivel - 1, colores.length - 1)];
 
                 ctx.save();
-
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 10*e;
-                ctx.shadowOffsetY = 3*e;
+                ctx.shadowBlur = 8 * s;
 
                 ctx.fillStyle = color;
-                ctx.shadowBlur = 8*e;
                 ctx.beginPath();
-                ctx.roundRect(x + 3*e, y + 6*e, 22*e, 28*e, 4*e);
+                ctx.roundRect(x + 3 * s, y + 6 * s, 22 * s, 28 * s, 4 * s);
                 ctx.fill();
 
                 ctx.shadowBlur = 0;
 
                 ctx.fillStyle = '#2E7D32';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2, y + 8*e, 12*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2, y + 8 * s, 12 * s, 0, Math.PI * 2);
                 ctx.fill();
 
-                const grad = ctx.createRadialGradient(x + this.ancho / 2 - 4*e, y + 6*e, 0, x + this.ancho / 2 - 4*e, y + 6*e, 5*e);
+                const grad = ctx.createRadialGradient(x + this.w / 2 - 4 * s, y + 6 * s, 0, x + this.w / 2 - 4 * s, y + 6 * s, 5 * s);
                 grad.addColorStop(0, '#FF1744');
                 grad.addColorStop(1, '#B71C1C');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 - 4*e, y + 6*e, 3.5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 - 4 * s, y + 6 * s, 3.5 * s, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + 4*e, y + 6*e, 3.5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + 4 * s, y + 6 * s, 3.5 * s, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = C.NEGRO;
+                ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 - 3*e, y + 7*e, 1.5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 - 3 * s, y + 7 * s, 1.5 * s, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(x + this.ancho / 2 + 5*e, y + 7*e, 1.5*e, 0, Math.PI * 2);
+                ctx.arc(x + this.w / 2 + 5 * s, y + 7 * s, 1.5 * s, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = C.BLANCO;
-                for (let i = -6*e; i <= 6*e; i += 4*e) {
-                    ctx.fillRect(x + this.ancho / 2 + i - 1*e, y + 12*e, 3*e, 4*e);
+                ctx.fillStyle = '#fff';
+                for (let i = -6 * s; i <= 6 * s; i += 4 * s) {
+                    ctx.fillRect(x + this.w / 2 + i - 1 * s, y + 12 * s, 3 * s, 4 * s);
                 }
 
+                const paso = this.frame * 0.2;
                 ctx.fillStyle = '#1B5E20';
-                const paso = this.animacionFrame * 0.2;
-                ctx.fillRect(x - 4*e, y + 14*e + Math.sin(paso) * 3*e, 5*e, 12*e);
-                ctx.fillRect(x + this.ancho - 1*e, y + 14*e + Math.sin(paso + Math.PI) * 3*e, 5*e, 12*e);
+                ctx.fillRect(x - 4 * s, y + 14 * s + Math.sin(paso) * 3 * s, 5 * s, 12 * s);
+                ctx.fillRect(x + this.w - 1 * s, y + 14 * s + Math.sin(paso + Math.PI) * 3 * s, 5 * s, 12 * s);
 
                 ctx.fillStyle = color;
-                const paso2 = this.animacionFrame * 0.3;
-                ctx.fillRect(x + 4*e, y + 34*e + Math.sin(paso2) * 2*e, 7*e, 10*e + Math.sin(paso2) * 2*e);
-                ctx.fillRect(x + 17*e, y + 34*e + Math.sin(paso2 + Math.PI) * 2*e, 7*e, 10*e + Math.sin(paso2 + Math.PI) * 2*e);
+                const paso2 = this.frame * 0.3;
+                ctx.fillRect(x + 4 * s, y + 34 * s + Math.sin(paso2) * 2 * s, 7 * s, 10 * s + Math.sin(paso2) * 2 * s);
+                ctx.fillRect(x + 17 * s, y + 34 * s + Math.sin(paso2 + Math.PI) * 2 * s, 7 * s, 10 * s + Math.sin(paso2 + Math.PI) * 2 * s);
 
                 ctx.restore();
 
-                if (this.tipo === 'disparador') {
+                if (this.dispara) {
                     ctx.fillStyle = 'rgba(255,0,0,0.3)';
-                    ctx.font = `${10*e}px Arial`;
+                    ctx.font = `${10*s}px Arial`;
                     ctx.textAlign = 'center';
-                    ctx.fillText('🔫', this.centroX, y - 16*e);
+                    ctx.fillText('🔫', this.cx, y - 16 * s);
                 }
 
                 if (this.vida < this.maxVida) {
-                    const anchoBarra = this.ancho + 10*e;
-                    const xBarra = x - 5*e;
-                    const yBarra = y - 12*e;
+                    const bw = this.w + 10 * s;
+                    const bx = x - 5 * s;
+                    const by = y - 12 * s;
                     ctx.fillStyle = 'rgba(0,0,0,0.7)';
-                    ctx.fillRect(xBarra, yBarra, anchoBarra, 4*e);
-                    ctx.fillStyle = this.vida / this.maxVida > 0.5 ? C.VERDE : C.ROJO;
-                    ctx.fillRect(xBarra, yBarra, anchoBarra * (this.vida / this.maxVida), 4*e);
+                    ctx.fillRect(bx, by, bw, 4 * s);
+                    ctx.fillStyle = this.vida / this.maxVida > 0.5 ? '#00E676' : '#FF1744';
+                    ctx.fillRect(bx, by, bw * (this.vida / this.maxVida), 4 * s);
                 }
             }
 
-            recibirDaño(daño) {
-                this.vida -= daño;
-                crearParticulas(this.centroX, this.centroY, C.ROJO, 10, 3);
-                return this.vida <= 0;
+            recibirDaño(d) {
+                this.vida -= d;
+                crearParticulas(this.cx, this.cy, '#ff1744', 10, 3);
+                if (this.vida <= 0) { this.vivo = false; }
+                return !this.vivo;
             }
         }
 
+        // ============================================================
         class Bala {
-            constructor(x, y, angulo, tipo = 'pistola', esEnemiga = false) {
-                const e = ESCALA;
+            constructor(x, y, angulo, tipo, enemiga = false) {
+                const s = S;
                 this.x = x;
                 this.y = y;
                 this.tipo = tipo;
-                this.esEnemiga = esEnemiga;
-                this.velocidad = tipo === 'pistola' ? 14*e : tipo === 'metralleta' ? 16*e : 10*e;
-                this.radio = tipo === 'pistola' ? 4*e : tipo === 'metralleta' ? 3*e : 8*e;
-                this.dx = Math.cos(angulo) * this.velocidad;
-                this.dy = Math.sin(angulo) * this.velocidad;
-                this.dano = tipo === 'escopeta' ? 3 : tipo === 'metralleta' ? 1 : 1;
-                this.trail = [];
+                this.enemiga = enemiga;
+                this.vel = (tipo === 'pistola' ? 14 : tipo === 'metralleta' ? 16 : 10) * s;
+                this.radio = (tipo === 'pistola' ? 4 : tipo === 'metralleta' ? 3 : 8) * s;
+                this.dx = Math.cos(angulo) * this.vel;
+                this.dy = Math.sin(angulo) * this.vel;
+                this.daño = tipo === 'escopeta' ? 3 : 1;
                 this.vida = 80;
+                this.trail = [];
             }
 
             mover() {
@@ -1178,24 +861,20 @@
             }
 
             dibujar() {
-                const e = ESCALA;
+                const s = S;
                 for (let i = 0; i < this.trail.length; i++) {
-                    const alpha = i / this.trail.length * 0.4;
+                    const a = i / this.trail.length * 0.4;
                     ctx.beginPath();
                     ctx.arc(this.trail[i].x, this.trail[i].y, this.radio * (i / this.trail.length), 0, Math.PI * 2);
-                    ctx.fillStyle = this.esEnemiga ?
-                        `rgba(255, 0, 0, ${alpha})` :
-                        this.tipo === 'pistola' ? `rgba(255, 255, 0, ${alpha})` : 
-                        this.tipo === 'metralleta' ? `rgba(0, 200, 255, ${alpha})` :
-                        `rgba(255, 165, 0, ${alpha})`;
+                    ctx.fillStyle = this.enemiga ? `rgba(255,0,0,${a})` :
+                        this.tipo === 'pistola' ? `rgba(255,255,0,${a})` :
+                        this.tipo === 'metralleta' ? `rgba(0,200,255,${a})` :
+                        `rgba(255,165,0,${a})`;
                     ctx.fill();
                 }
 
-                const grad = ctx.createRadialGradient(
-                    this.x - 2*e, this.y - 2*e, 0,
-                    this.x, this.y, this.radio
-                );
-                if (this.esEnemiga) {
+                const grad = ctx.createRadialGradient(this.x - 2 * s, this.y - 2 * s, 0, this.x, this.y, this.radio);
+                if (this.enemiga) {
                     grad.addColorStop(0, '#FF6666');
                     grad.addColorStop(1, '#CC0000');
                 } else if (this.tipo === 'pistola') {
@@ -1212,42 +891,37 @@
                 ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
                 ctx.fillStyle = grad;
                 ctx.fill();
-
-                ctx.beginPath();
-                ctx.arc(this.x - 1*e, this.y - 2*e, this.radio * 0.3, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.fill();
             }
         }
 
+        // ============================================================
         class Granada {
             constructor(x, y, angulo) {
-                const e = ESCALA;
+                const s = S;
                 this.x = x;
                 this.y = y;
-                this.vx = Math.cos(angulo) * 3 * e;
-                this.vy = Math.sin(angulo) * 3 * e - 2 * e;
-                this.radio = 10 * e;
+                this.vx = Math.cos(angulo) * 3 * s;
+                this.vy = Math.sin(angulo) * 3 * s - 2 * s;
+                this.radio = 10 * s;
                 this.alive = true;
                 this.timer = 90;
                 this.exploto = false;
-                this.explosionRadio = 0;
-                this.maxExplosion = 130 * e;
-                this.explosionTimer = 0;
+                this.explosionR = 0;
+                this.maxR = 130 * s;
+                this.timerExp = 0;
             }
 
             mover() {
-                const e = ESCALA;
+                const s = S;
                 const plataformas = getPlataformas();
                 if (this.exploto) {
-                    this.explosionTimer++;
-                    this.explosionRadio += 4 * e;
-                    if (this.explosionTimer > 25) this.alive = false;
+                    this.timerExp++;
+                    this.explosionR += 4 * s;
+                    if (this.timerExp > 25) this.alive = false;
                     return;
                 }
-
                 this.timer--;
-                this.vy += 0.3 * e;
+                this.vy += 0.3 * s;
                 this.x += this.vx;
                 this.y += this.vy;
 
@@ -1258,59 +932,52 @@
                         this.vy *= -0.3;
                     }
                 }
-
-                if (this.y + this.radio > ALTO - 50*e) {
-                    this.y = ALTO - 50*e - this.radio;
+                if (this.y + this.radio > H - 50 * s) {
+                    this.y = H - 50 * s - this.radio;
                     this.vy *= -0.3;
                 }
-
-                if (this.timer <= 0) {
-                    this.exploto = true;
-                }
+                if (this.timer <= 0) this.exploto = true;
             }
 
-            colisionaCon(zombi) {
+            colisiona(zombi) {
                 if (this.exploto) return false;
-                const dist = distancia(this.x, this.y, zombi.centroX, zombi.centroY);
-                return dist < this.radio + 16*ESCALA;
+                return dist(this, zombi) < this.radio + 16 * S;
             }
 
             dibujar() {
-                const e = ESCALA;
+                const s = S;
                 if (this.exploto) {
-                    const alpha = 1 - (this.explosionTimer / 25);
-                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.explosionRadio);
-                    grad.addColorStop(0, `rgba(255,200,50,${alpha * 0.9})`);
-                    grad.addColorStop(0.3, `rgba(255,100,20,${alpha * 0.7})`);
-                    grad.addColorStop(0.7, `rgba(200,50,0,${alpha * 0.5})`);
+                    const a = 1 - (this.timerExp / 25);
+                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.explosionR);
+                    grad.addColorStop(0, `rgba(255,200,50,${a*0.9})`);
+                    grad.addColorStop(0.3, `rgba(255,100,20,${a*0.7})`);
+                    grad.addColorStop(0.7, `rgba(200,50,0,${a*0.5})`);
                     grad.addColorStop(1, `rgba(100,20,0,0)`);
                     ctx.fillStyle = grad;
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.explosionRadio, 0, Math.PI * 2);
+                    ctx.arc(this.x, this.y, this.explosionR, 0, Math.PI * 2);
                     ctx.fill();
-
                     ctx.shadowColor = '#ff8800';
-                    ctx.shadowBlur = 40*e;
-                    ctx.fillStyle = `rgba(255,200,100,${alpha * 0.3})`;
+                    ctx.shadowBlur = 40 * s;
+                    ctx.fillStyle = `rgba(255,200,100,${a*0.3})`;
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.explosionRadio * 0.5, 0, Math.PI * 2);
+                    ctx.arc(this.x, this.y, this.explosionR * 0.5, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.shadowBlur = 0;
                     return;
                 }
-
                 ctx.shadowColor = '#333';
-                ctx.shadowBlur = 8*e;
+                ctx.shadowBlur = 8 * s;
                 ctx.fillStyle = '#2c3e50';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.fillStyle = '#7f8c8d';
-                ctx.fillRect(this.x - 3*e, this.y - 12*e, 6*e, 4*e);
+                ctx.fillRect(this.x - 3 * s, this.y - 12 * s, 6 * s, 4 * s);
                 if (Math.floor(this.timer / 10) % 2 === 0) {
                     ctx.fillStyle = '#ff3333';
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, 5*e, 0, Math.PI * 2);
+                    ctx.arc(this.x, this.y, 5 * s, 0, Math.PI * 2);
                     ctx.fill();
                 }
                 ctx.shadowBlur = 0;
@@ -1318,1042 +985,787 @@
 
             getDaño(zombi) {
                 if (!this.exploto) return 0;
-                const dist = distancia(this.x, this.y, zombi.centroX, zombi.centroY);
-                if (dist < this.explosionRadio) {
-                    const factor = 1 - (dist / this.explosionRadio);
-                    return Math.floor(8 * factor);
-                }
+                const d = dist(this, zombi);
+                if (d < this.explosionR) return Math.floor(8 * (1 - d / this.explosionR));
                 return 0;
             }
         }
 
+        // ============================================================
         class ArmaSuelo {
             constructor(x, y, tipo) {
-                const e = ESCALA;
+                const s = S;
                 this.x = x;
                 this.y = this.encontrarPiso(x, y);
                 this.tipo = tipo;
-                this.radio = 14 * e;
+                this.radio = 14 * s;
                 this.activo = true;
-                this.tiempo = 0;
-                this.flotando = 0;
                 this.timer = 600;
+                this.flotando = 0;
+                this.tiempo = 0;
             }
 
             encontrarPiso(x, y) {
-                const e = ESCALA;
+                const s = S;
                 const plataformas = getPlataformas();
-                let pisoY = ALTO - 50 * e;
+                let piso = H - 50 * s;
                 for (const p of plataformas) {
-                    if (x > p.x && x < p.x + p.w && y < p.y) {
-                        if (p.y < pisoY) pisoY = p.y;
-                    }
+                    if (x > p.x && x < p.x + p.w && y < p.y && p.y < piso) piso = p.y;
                 }
-                return pisoY - 20 * e;
+                return piso - 20 * s;
             }
 
             dibujar() {
-                const e = ESCALA;
+                const s = S;
                 if (!this.activo || this.timer <= 0) return;
                 this.tiempo++;
-                this.flotando = Math.sin(this.tiempo * 0.05) * 4 * e;
+                this.flotando = Math.sin(this.tiempo * 0.05) * 4 * s;
 
                 ctx.save();
+                ctx.shadowColor = 'rgba(255,165,0,0.5)';
+                ctx.shadowBlur = 25 * s;
 
-                ctx.shadowColor = 'rgba(255, 165, 0, 0.5)';
-                ctx.shadowBlur = 25 * e;
-
-                const grad = ctx.createRadialGradient(
-                    this.x, this.y + this.flotando, 0,
-                    this.x, this.y + this.flotando, this.radio
-                );
+                const grad = ctx.createRadialGradient(this.x, this.y + this.flotando, 0, this.x, this.y + this.flotando, this.radio);
                 grad.addColorStop(0, '#FFB74D');
                 grad.addColorStop(1, '#E65100');
                 ctx.beginPath();
                 ctx.arc(this.x, this.y + this.flotando, this.radio, 0, Math.PI * 2);
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = C.BLANCO;
-                ctx.lineWidth = 2 * e;
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2 * s;
                 ctx.stroke();
 
                 ctx.shadowBlur = 0;
-
-                ctx.fillStyle = C.BLANCO;
-                ctx.font = `${16*e}px Arial`;
+                ctx.fillStyle = '#fff';
+                ctx.font = `${16*s}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('🔫', this.x, this.y + this.flotando);
 
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.font = `${9*e}px Arial`;
-                ctx.textAlign = 'center';
+                ctx.font = `${9*s}px Arial`;
                 ctx.textBaseline = 'top';
-                ctx.fillText(this.tipo.toUpperCase(), this.x, this.y + this.flotando + this.radio + 4*e);
-
+                ctx.fillText(this.tipo.toUpperCase(), this.x, this.y + this.flotando + this.radio + 4 * s);
                 ctx.restore();
             }
         }
 
         class CorazonSuelo {
             constructor(x, y) {
-                const e = ESCALA;
+                const s = S;
                 this.x = x;
                 this.y = y;
-                this.radio = 15 * e;
+                this.radio = 15 * s;
                 this.activo = true;
-                this.tiempo = 0;
-                this.flotando = 0;
                 this.timer = 600;
+                this.flotando = 0;
+                this.tiempo = 0;
             }
 
             dibujar() {
-                const e = ESCALA;
+                const s = S;
                 if (!this.activo || this.timer <= 0) return;
                 this.tiempo++;
-                this.flotando = Math.sin(this.tiempo * 0.05) * 4 * e;
+                this.flotando = Math.sin(this.tiempo * 0.05) * 4 * s;
 
                 ctx.save();
+                ctx.shadowColor = 'rgba(255,0,0,0.5)';
+                ctx.shadowBlur = 30 * s;
 
-                ctx.shadowColor = 'rgba(255, 0, 0, 0.5)';
-                ctx.shadowBlur = 30 * e;
-
-                ctx.font = `${30*e}px Arial`;
+                ctx.font = `${30*s}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('❤️', this.x, this.y + this.flotando);
 
                 ctx.shadowBlur = 0;
-
                 ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.font = `${8*e}px Arial`;
-                ctx.textAlign = 'center';
+                ctx.font = `${8*s}px Arial`;
                 ctx.textBaseline = 'top';
-                ctx.fillText('+1 VIDA', this.x, this.y + this.flotando + 18*e);
-
+                ctx.fillText('+1 VIDA', this.x, this.y + this.flotando + 18 * s);
                 ctx.restore();
             }
         }
 
-        // ==================== CLASE PRINCIPAL DEL JUEGO ====================
-        class Juego {
-            constructor(genero) {
-                const e = ESCALA;
-                this.jugador = new Personaje(ANCHO / 2 - 15*e, ALTO - 100*e, genero);
-                this.zombis = [];
-                this.balas = [];
-                this.balasEnemigas = [];
-                this.armasSuelo = [];
-                this.granadas = [];
-                this.granadasSuelo = [];
-                this.corazonesSuelo = [];
-                this.perro = null;
-                this.puntuacion = 0;
-                this.tiempoInicio = Date.now();
-                this.ultimoSpawn = 0;
-                this.juegoTerminado = false;
-                this.zombisPorSpawn = 1;
-                this.tiempoEntreSpawn = 1500;
-                this.teclas = {};
-                this.mouseX = ANCHO / 2;
-                this.mouseY = ALTO / 2;
-                this.mousePresionado = false;
-                this.tiempoAtaqueZombi = 0;
-                this.disparoCooldown = 0;
-                this.minutoActual = 0;
-                this.eliminadosParaCorazon = 0;
-                this.corazonesRecogidos = 0;
-                this.perroActivo = false;
-                this.juegoIniciado = true;
-                this.tiempoUltimoReinicio = Date.now();
+        // ============================================================
+        // VARIABLES DEL JUEGO
+        // ============================================================
+        let jugador = null;
+        let zombis = [];
+        let balas = [];
+        let balasEnemigas = [];
+        let granadas = [];
+        let armasSuelo = [];
+        let corazonesSuelo = [];
+        let granadasSuelo = [];
+        let perro = null;
+        let teclas = {};
+        let mouseX = 0,
+            mouseY = 0;
+        let mousePresionado = false;
+        let disparoCooldown = 0;
+        let spawnTimer = 0;
+        let granadaSueloTimer = 0;
+        let perroActivo = false;
+        let eliminadosParaCorazon = 0;
 
-                this.setupEventListeners();
-                this.buclePrincipal();
+        // ============================================================
+        // FUNCIONES DEL JUEGO
+        // ============================================================
+        function reiniciarJuego(genero) {
+            const s = S;
+            jugador = new Jugador(genero);
+            zombis = [];
+            balas = [];
+            balasEnemigas = [];
+            granadas = [];
+            armasSuelo = [];
+            corazonesSuelo = [];
+            granadasSuelo = [];
+            perro = null;
+            perroActivo = false;
+            eliminadosParaCorazon = 0;
+            juego.puntuacion = 0;
+            juego.tiempo = 0;
+            juego.tiempoInicio = Date.now();
+            juego.ultimoSpawn = 0;
+            juego.gameOver = false;
+            juego.jugando = true;
+            juego.menu = false;
+            mousePresionado = false;
+            disparoCooldown = 0;
+            spawnTimer = 0;
+            granadaSueloTimer = 0;
+            particulas = [];
+        }
+
+        function spawnZombi() {
+            const s = S;
+            const minutos = Math.floor(juego.tiempo / 60);
+            const nivel = Math.min(minutos + 1, 8);
+            const margen = 80 * s;
+            let x, y;
+            let intentos = 0;
+            do {
+                const lado = randInt(0, 3);
+                if (lado === 0) { x = rand(0, W);
+                    y = -margen; } else if (lado === 1) { x = rand(0, W);
+                    y = H - 50 * s + margen; } else if (lado === 2) { x = -margen;
+                    y = rand(0, H - 50 * s); } else { x = W + margen;
+                    y = rand(0, H - 50 * s); }
+                intentos++;
+            } while (dist({ x, y }, jugador) < 200 * s && intentos < 20);
+
+            const z = new Zombi(x, y, nivel);
+            z.configurar(minutos);
+            return z;
+        }
+
+        function disparar() {
+            if (disparoCooldown > 0 || !jugador || !jugador.vivo) return;
+            const balas2 = jugador.disparar(mouseX, mouseY);
+            if (balas2) {
+                if (Array.isArray(balas2)) balas.push(...balas2);
+                else balas.push(balas2);
+                disparoCooldown = 8;
+                const a = Math.atan2(mouseY - jugador.cy, mouseX - jugador.cx);
+                crearParticulas(jugador.cx + Math.cos(a) * 25 * S, jugador.cy + Math.sin(a) * 25 * S, '#FFD700', 5, 2);
+            }
+        }
+
+        function actualizar() {
+            if (juego.menu || juego.gameOver || !jugador || !jugador.vivo) return;
+
+            const tiempo = (Date.now() - juego.tiempoInicio) / 1000;
+            juego.tiempo = tiempo;
+            const minutos = Math.floor(tiempo / 60);
+
+            // Actualizar jugador
+            jugador.mover(teclas, mouseX, mouseY);
+            disparoCooldown = Math.max(0, disparoCooldown - 1);
+
+            // Perro (minuto 2)
+            if (minutos >= 2 && !perroActivo && !perro) {
+                perro = new Perro(jugador.x - 40 * S, jugador.y);
+                perroActivo = true;
+                crearParticulas(perro.cx, perro.cy, '#FFD700', 30, 5);
             }
 
-            setupEventListeners() {
-                const keyHandler = (e) => {
-                    const key = e.key.toLowerCase();
-                    this.teclas[key] = e.type === 'keydown';
-                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
-                        e.preventDefault();
+            if (perro && perro.vivo) {
+                perro.buscar(zombis);
+                perro.mover(jugador);
+                if (perro.atacar(zombis)) {
+                    juego.puntuacion += 5;
+                    eliminadosParaCorazon++;
+                    if (eliminadosParaCorazon >= 20) {
+                        eliminadosParaCorazon = 0;
+                        const cx = perro.cx + rand(-50 * S, 50 * S);
+                        const cy = perro.cy + rand(-50 * S, 50 * S);
+                        corazonesSuelo.push(new CorazonSuelo(
+                            Math.max(20 * S, Math.min(W - 20 * S, cx)),
+                            Math.max(20 * S, Math.min(H - 80 * S, cy))
+                        ));
                     }
-                    if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && e.type === 'keydown') {
-                        this.jugador.saltar();
-                    }
-                    if (e.key === 'g' && e.type === 'keydown') {
-                        const granada = this.jugador.lanzarGranada(this.mouseX, this.mouseY);
-                        if (granada) this.granadas.push(granada);
-                    }
-                    if ((e.key === 'e' || e.key === 'q') && e.type === 'keydown') {
-                        this.jugador.cambiarArma();
-                    }
-                };
-
-                document.addEventListener('keydown', keyHandler);
-                document.addEventListener('keyup', keyHandler);
-
-                // Mouse
-                canvas.addEventListener('mousemove', (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    this.mouseX = e.clientX - rect.left;
-                    this.mouseY = e.clientY - rect.top;
-                });
-
-                canvas.addEventListener('mousedown', (e) => {
-                    if (e.button === 0) {
-                        this.mousePresionado = true;
-                        if (this.jugador.vivo && !this.juegoTerminado) {
-                            this.disparar();
-                        }
-                    }
-                });
-
-                canvas.addEventListener('mouseup', () => {
-                    this.mousePresionado = false;
-                });
-
-                // Touch
-                canvas.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    if (touch) {
-                        const rect = canvas.getBoundingClientRect();
-                        this.mouseX = touch.clientX - rect.left;
-                        this.mouseY = touch.clientY - rect.top;
-                        this.mousePresionado = true;
-                        if (this.jugador.vivo && !this.juegoTerminado) {
-                            this.disparar();
-                        }
-                    }
-                }, { passive: false });
-
-                canvas.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    if (touch) {
-                        const rect = canvas.getBoundingClientRect();
-                        this.mouseX = touch.clientX - rect.left;
-                        this.mouseY = touch.clientY - rect.top;
-                    }
-                }, { passive: false });
-
-                canvas.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    this.mousePresionado = false;
-                }, { passive: false });
-
-                // Disparo continuo
-                setInterval(() => {
-                    if (this.mousePresionado && this.jugador.vivo && !this.juegoTerminado) {
-                        this.disparar();
-                    }
-                }, 100);
-
-                // Joystick
-                const joystickZone = document.getElementById('joystickZone');
-                const joystickKnob = document.getElementById('joystickKnob');
-
-                function handleJoystick(clientX, clientY) {
-                    const rect = joystickZone.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    const maxDist = rect.width / 2 - 20;
-                    
-                    let dx = clientX - centerX;
-                    let dy = clientY - centerY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist > maxDist) {
-                        dx = (dx / dist) * maxDist;
-                        dy = (dy / dist) * maxDist;
-                    }
-                    
-                    joystickX = dx / maxDist;
-                    joystickY = dy / maxDist;
-                    
-                    joystickKnob.style.transform = `translate(${-50 + (dx / maxDist) * 50}%, ${-50 + (dy / maxDist) * 50}%)`;
                 }
-
-                function resetJoystick() {
-                    joystickX = 0;
-                    joystickY = 0;
-                    joystickKnob.style.transform = 'translate(-50%, -50%)';
-                }
-
-                joystickZone.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    if (touch) {
-                        handleJoystick(touch.clientX, touch.clientY);
-                    }
-                }, { passive: false });
-
-                joystickZone.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    if (touch) {
-                        handleJoystick(touch.clientX, touch.clientY);
-                    }
-                }, { passive: false });
-
-                joystickZone.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    resetJoystick();
-                }, { passive: false });
-
-                // Botones móviles
-                document.getElementById('btnJump').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (this.jugador.vivo && !this.juegoTerminado) this.jugador.saltar();
-                }, { passive: false });
-                document.getElementById('btnJump').addEventListener('mousedown', () => {
-                    if (this.jugador.vivo && !this.juegoTerminado) this.jugador.saltar();
-                });
-
-                document.getElementById('btnGrenade').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (this.jugador.vivo && !this.juegoTerminado) {
-                        const granada = this.jugador.lanzarGranada(this.mouseX, this.mouseY);
-                        if (granada) this.granadas.push(granada);
-                    }
-                }, { passive: false });
-                document.getElementById('btnGrenade').addEventListener('mousedown', () => {
-                    if (this.jugador.vivo && !this.juegoTerminado) {
-                        const granada = this.jugador.lanzarGranada(this.mouseX, this.mouseY);
-                        if (granada) this.granadas.push(granada);
-                    }
-                });
-
-                document.getElementById('btnSwitch').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (this.jugador.vivo && !this.juegoTerminado) this.jugador.cambiarArma();
-                }, { passive: false });
-                document.getElementById('btnSwitch').addEventListener('mousedown', () => {
-                    if (this.jugador.vivo && !this.juegoTerminado) this.jugador.cambiarArma();
-                });
-
-                document.getElementById('btnShoot').addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (this.jugador.vivo && !this.juegoTerminado) {
-                        this.mousePresionado = true;
-                        this.disparar();
-                    }
-                }, { passive: false });
-                document.getElementById('btnShoot').addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    this.mousePresionado = false;
-                }, { passive: false });
-                document.getElementById('btnShoot').addEventListener('mousedown', () => {
-                    if (this.jugador.vivo && !this.juegoTerminado) {
-                        this.mousePresionado = true;
-                        this.disparar();
-                    }
-                });
-                document.getElementById('btnShoot').addEventListener('mouseup', () => {
-                    this.mousePresionado = false;
-                });
+                zombis = zombis.filter(z => z.vivo);
             }
 
-            disparar() {
-                if (this.disparoCooldown > 0) return;
-                if (!this.jugador.vivo) return;
+            // Granadas en suelo
+            granadaSueloTimer++;
+            if (granadaSueloTimer > 1800 && granadasSuelo.length < 3) {
+                granadaSueloTimer = 0;
+                granadasSuelo.push({
+                    x: 50 * S + rand(0, W - 100 * S),
+                    y: 50 * S + rand(0, H - 150 * S),
+                    radio: 12 * S,
+                    activo: true
+                });
+                crearParticulas(granadasSuelo[granadasSuelo.length - 1].x, granadasSuelo[granadasSuelo.length - 1].y, '#FFD700', 10, 3);
+            }
 
-                const balas = this.jugador.disparar(this.mouseX, this.mouseY);
-                if (balas) {
-                    if (Array.isArray(balas)) {
-                        this.balas.push(...balas);
-                    } else {
-                        this.balas.push(balas);
+            // Recoger granadas
+            for (let i = granadasSuelo.length - 1; i >= 0; i--) {
+                const g = granadasSuelo[i];
+                if (!g.activo) { granadasSuelo.splice(i, 1); continue; }
+                if (dist(g, jugador) < 35 * S) {
+                    if (jugador.granadas < jugador.maxGranadas) {
+                        jugador.granadas++;
+                        g.activo = false;
+                        granadasSuelo.splice(i, 1);
+                        crearParticulas(g.x, g.y, '#FFD700', 15, 4);
                     }
-                    this.disparoCooldown = 8;
-                    const angulo = Math.atan2(this.mouseY - this.jugador.centroY, this.mouseX - this.jugador.centroX);
-                    const e = ESCALA;
-                    crearParticulas(this.jugador.centroX + Math.cos(angulo) * 25*e,
-                                   this.jugador.centroY + Math.sin(angulo) * 25*e, '#FFD700', 5, 2);
                 }
             }
 
-            spawnZombi(minutos) {
-                const e = ESCALA;
-                const nivelResistencia = Math.min(minutos + 1, 8);
-                const margen = 80 * e;
-                let x, y;
-                let intentos = 0;
-                
-                do {
-                    const lado = Math.floor(Math.random() * 4);
-                    if (lado === 0) { x = Math.random() * ANCHO; y = -margen; }
-                    else if (lado === 1) { x = Math.random() * ANCHO; y = ALTO - 50*e + margen; }
-                    else if (lado === 2) { x = -margen; y = Math.random() * (ALTO - 50*e); }
-                    else { x = ANCHO + margen; y = Math.random() * (ALTO - 50*e); }
-                    intentos++;
-                } while (distancia(x, y, this.jugador.centroX, this.jugador.centroY) < 200*e && intentos < 20);
-
-                const zombi = new Zombi(x, y, nivelResistencia);
-                zombi.configurar(minutos);
-                return zombi;
+            // Recoger corazones
+            for (let i = corazonesSuelo.length - 1; i >= 0; i--) {
+                const c = corazonesSuelo[i];
+                if (!c.activo) { corazonesSuelo.splice(i, 1); continue; }
+                if (dist(c, jugador) < 30 * S) {
+                    if (jugador.vidas < jugador.maxVidas) {
+                        jugador.vidas++;
+                        c.activo = false;
+                        corazonesSuelo.splice(i, 1);
+                        crearParticulas(c.x, c.y, '#FF1744', 20, 5);
+                    }
+                }
             }
 
-            actualizar() {
-                const e = ESCALA;
-                if (!this.jugador.vivo || this.juegoTerminado) return;
-
-                const tiempoActual = Date.now();
-                const minutos = Math.floor((tiempoActual - this.tiempoInicio) / 60000);
-                this.minutoActual = minutos;
-
-                this.jugador.mover(this.teclas, this.mouseX, this.mouseY);
-                this.disparoCooldown = Math.max(0, this.disparoCooldown - 1);
-
-                // Spawn del perro en el minuto 2
-                if (minutos >= 2 && !this.perroActivo && !this.perro) {
-                    this.perro = new Perro(this.jugador.x - 40*e, this.jugador.y);
-                    this.perroActivo = true;
-                    crearParticulas(this.perro.centroX, this.perro.centroY, '#FFD700', 30, 5);
+            // Balas del jugador
+            for (let i = balas.length - 1; i >= 0; i--) {
+                const b = balas[i];
+                b.mover();
+                if (b.x < -20 * S || b.x > W + 20 * S || b.y < -20 * S || b.y > H + 20 * S || b.vida <= 0) {
+                    balas.splice(i, 1);
+                    continue;
                 }
-
-                // Actualizar perro
-                if (this.perro && this.perro.vivo) {
-                    this.perro.buscarObjetivo(this.zombis);
-                    this.perro.mover(this.jugador);
-                    if (this.perro.atacar(this.zombis)) {
-                        this.puntuacion += 5;
-                        this.eliminadosParaCorazon++;
-                        if (this.eliminadosParaCorazon >= 20) {
-                            this.eliminadosParaCorazon = 0;
-                            const cx = this.perro.centroX + aleatorio(-50*e, 50*e);
-                            const cy = this.perro.centroY + aleatorio(-50*e, 50*e);
-                            this.corazonesSuelo.push(new CorazonSuelo(
-                                Math.max(20*e, Math.min(ANCHO - 20*e, cx)),
-                                Math.max(20*e, Math.min(ALTO - 80*e, cy))
-                            ));
-                        }
-                    }
-                    this.zombis = this.zombis.filter(z => z.vida > 0);
-                }
-
-                // Granadas en el suelo (cada 30 segundos)
-                if (Math.random() < 0.001 && this.granadasSuelo.length < 3) {
-                    const x = 50*e + Math.random() * (ANCHO - 100*e);
-                    const y = 50*e + Math.random() * (ALTO - 150*e);
-                    this.granadasSuelo.push({
-                        x: x,
-                        y: y,
-                        radio: 12*e,
-                        activo: true
-                    });
-                    crearParticulas(x, y, '#FFD700', 10, 3);
-                }
-
-                // Recoger granadas del suelo
-                for (let i = this.granadasSuelo.length - 1; i >= 0; i--) {
-                    const g = this.granadasSuelo[i];
-                    if (!g.activo) {
-                        this.granadasSuelo.splice(i, 1);
-                        continue;
-                    }
-                    const dist = distancia(g.x, g.y, this.jugador.centroX, this.jugador.centroY);
-                    if (dist < 35*e) {
-                        if (this.jugador.granadas < this.jugador.maxGranadas) {
-                            this.jugador.granadas++;
-                            g.activo = false;
-                            this.granadasSuelo.splice(i, 1);
-                            crearParticulas(g.x, g.y, '#FFD700', 15, 4);
-                        }
-                    }
-                }
-
-                // Recoger corazones del suelo
-                for (let i = this.corazonesSuelo.length - 1; i >= 0; i--) {
-                    const c = this.corazonesSuelo[i];
-                    if (!c.activo) {
-                        this.corazonesSuelo.splice(i, 1);
-                        continue;
-                    }
-                    const dist = distancia(c.x, c.y, this.jugador.centroX, this.jugador.centroY);
-                    if (dist < 30*e) {
-                        if (this.jugador.corazones < this.jugador.maxCorazones) {
-                            this.jugador.corazones++;
-                            c.activo = false;
-                            this.corazonesSuelo.splice(i, 1);
-                            crearParticulas(c.x, c.y, '#FF1744', 20, 5);
-                            this.corazonesRecogidos++;
-                        }
-                    }
-                }
-
-                // Actualizar balas del jugador
-                for (let i = this.balas.length - 1; i >= 0; i--) {
-                    const bala = this.balas[i];
-                    bala.mover();
-                    if (bala.x < -20*e || bala.x > ANCHO + 20*e || bala.y < -20*e || bala.y > ALTO + 20*e || bala.vida <= 0) {
-                        this.balas.splice(i, 1);
-                    }
-                }
-
-                // Actualizar balas enemigas
-                for (let i = this.balasEnemigas.length - 1; i >= 0; i--) {
-                    const bala = this.balasEnemigas[i];
-                    bala.mover();
-                    if (bala.x < -20*e || bala.x > ANCHO + 20*e || bala.y < -20*e || bala.y > ALTO + 20*e || bala.vida <= 0) {
-                        this.balasEnemigas.splice(i, 1);
-                    }
-                    if (this.jugador.vivo) {
-                        const dist = distancia(bala.x, bala.y, this.jugador.centroX, this.jugador.centroY);
-                        if (dist < bala.radio + 15*e) {
-                            this.jugador.recibirDaño(1);
-                            this.balasEnemigas.splice(i, 1);
-                            if (!this.jugador.vivo) {
-                                this.juegoTerminado = true;
-                                return;
+                // Colisión con zombis
+                for (const z of zombis) {
+                    if (!z.vivo) continue;
+                    if (dist(b, z) < b.radio + 16 * S) {
+                        if (z.recibirDaño(b.daño)) {
+                            juego.puntuacion += 5 + Math.floor(minutos * 0.5);
+                            eliminadosParaCorazon++;
+                            if (eliminadosParaCorazon >= 20) {
+                                eliminadosParaCorazon = 0;
+                                const cx = z.cx + rand(-50 * S, 50 * S);
+                                const cy = z.cy + rand(-50 * S, 50 * S);
+                                corazonesSuelo.push(new CorazonSuelo(
+                                    Math.max(20 * S, Math.min(W - 20 * S, cx)),
+                                    Math.max(20 * S, Math.min(H - 80 * S, cy))
+                                ));
                             }
+                            if (Math.random() < 0.12) {
+                                const tipos = ['escopeta', 'metralleta'];
+                                armasSuelo.push(new ArmaSuelo(z.x, z.y, tipos[randInt(0, 1)]));
+                            }
+                            crearParticulas(z.cx, z.cy, '#00E676', 20, 5);
                         }
+                        balas.splice(i, 1);
+                        break;
                     }
                 }
-
-                // Actualizar granadas
-                for (let i = this.granadas.length - 1; i >= 0; i--) {
-                    const granada = this.granadas[i];
-                    granada.mover();
-                    
-                    if (!granada.exploto) {
-                        for (const zombi of this.zombis) {
-                            if (granada.colisionaCon(zombi)) {
-                                granada.exploto = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (!granada.alive) {
-                        this.granadas.splice(i, 1);
-                        continue;
-                    }
-                    
-                    if (granada.exploto) {
-                        for (const zombi of this.zombis) {
-                            const daño = granada.getDaño(zombi);
-                            if (daño > 0) {
-                                if (zombi.recibirDaño(daño)) {
-                                    this.puntuacion += 10 + minutos;
-                                    this.eliminadosParaCorazon++;
-                                    if (this.eliminadosParaCorazon >= 20) {
-                                        this.eliminadosParaCorazon = 0;
-                                        const cx = zombi.centroX + aleatorio(-50*e, 50*e);
-                                        const cy = zombi.centroY + aleatorio(-50*e, 50*e);
-                                        this.corazonesSuelo.push(new CorazonSuelo(
-                                            Math.max(20*e, Math.min(ANCHO - 20*e, cx)),
-                                            Math.max(20*e, Math.min(ALTO - 80*e, cy))
-                                        ));
-                                    }
-                                    if (Math.random() < 0.15) {
-                                        const tipos = ['escopeta', 'metralleta'];
-                                        const tipo = tipos[Math.floor(Math.random() * tipos.length)];
-                                        this.armasSuelo.push(new ArmaSuelo(zombi.x, zombi.y, tipo));
-                                    }
-                                    crearParticulas(zombi.centroX, zombi.centroY, C.VERDE, 20, 5);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Actualizar zombis
-                for (let i = this.zombis.length - 1; i >= 0; i--) {
-                    const zombi = this.zombis[i];
-                    zombi.moverHacia(this.jugador);
-
-                    const dist = distancia(zombi.centroX, zombi.centroY, this.jugador.centroX, this.jugador.centroY);
-                    if (dist < 30*e) {
-                        if (this.tiempoAtaqueZombi <= 0) {
-                            this.jugador.recibirDaño(1);
-                            this.tiempoAtaqueZombi = 40;
-                            if (!this.jugador.vivo) {
-                                this.juegoTerminado = true;
-                                return;
-                            }
-                        }
-                    }
-
-                    // Disparo de zombis
-                    if (zombi.puedeDisparar && dist < 350*e && dist > 50*e) {
-                        zombi.tiempoDisparo++;
-                        if (zombi.tiempoDisparo > 60 + Math.random() * 40) {
-                            zombi.tiempoDisparo = 0;
-                            const angulo = Math.atan2(this.jugador.centroY - zombi.centroY,
-                                                    this.jugador.centroX - zombi.centroX);
-                            this.balasEnemigas.push(new Bala(zombi.centroX, zombi.centroY, angulo, 'pistola', true));
-                            crearParticulas(zombi.centroX, zombi.centroY, '#FF6B6B', 5, 2);
-                        }
-                    }
-
-                    // Colisión con balas del jugador
-                    for (let j = this.balas.length - 1; j >= 0; j--) {
-                        const bala = this.balas[j];
-                        const distBala = distancia(bala.x, bala.y, zombi.centroX, zombi.centroY);
-                        if (distBala < bala.radio + 16*e) {
-                            if (zombi.recibirDaño(bala.dano)) {
-                                this.zombis.splice(i, 1);
-                                this.puntuacion += 5 + Math.floor(minutos * 0.5);
-                                this.eliminadosParaCorazon++;
-                                if (this.eliminadosParaCorazon >= 20) {
-                                    this.eliminadosParaCorazon = 0;
-                                    const cx = zombi.centroX + aleatorio(-50*e, 50*e);
-                                    const cy = zombi.centroY + aleatorio(-50*e, 50*e);
-                                    this.corazonesSuelo.push(new CorazonSuelo(
-                                        Math.max(20*e, Math.min(ANCHO - 20*e, cx)),
-                                        Math.max(20*e, Math.min(ALTO - 80*e, cy))
-                                    ));
-                                }
-                                if (Math.random() < 0.12) {
-                                    const tipos = ['escopeta', 'metralleta'];
-                                    const tipo = tipos[Math.floor(Math.random() * tipos.length)];
-                                    this.armasSuelo.push(new ArmaSuelo(zombi.x, zombi.y, tipo));
-                                }
-                                crearParticulas(zombi.centroX, zombi.centroY, C.VERDE, 20, 5);
-                            }
-                            this.balas.splice(j, 1);
-                            break;
-                        }
-                    }
-                }
-
-                this.zombis = this.zombis.filter(z => z.vida > 0);
-
-                // Actualizar armas en suelo
-                for (let i = this.armasSuelo.length - 1; i >= 0; i--) {
-                    const arma = this.armasSuelo[i];
-                    arma.timer--;
-                    if (arma.timer <= 0) {
-                        this.armasSuelo.splice(i, 1);
-                        continue;
-                    }
-                    if (arma.activo) {
-                        const dist = distancia(arma.x, arma.y, this.jugador.centroX, this.jugador.centroY);
-                        if (dist < this.jugador.ancho / 2 + arma.radio + 10*e) {
-                            if (arma.tipo === 'escopeta') {
-                                this.jugador.arma_actual = 'escopeta';
-                                this.jugador.balas_escopeta = 6;
-                            } else if (arma.tipo === 'metralleta') {
-                                this.jugador.arma_actual = 'metralleta';
-                                this.jugador.balas_metralleta = 30;
-                                this.jugador.recargando = false;
-                            }
-                            arma.activo = false;
-                            this.armasSuelo.splice(i, 1);
-                            crearParticulas(arma.x, arma.y, C.NARANJA, 20, 5);
-                        }
-                    }
-                }
-
-                // Spawn de zombis
-                const spawnRate = Math.max(300, 1200 - (minutos * 20));
-                if (tiempoActual - this.ultimoSpawn > spawnRate) {
-                    this.zombisPorSpawn = 1 + Math.floor(minutos * 0.2);
-                    const cantidad = Math.min(this.zombisPorSpawn, 8);
-                    for (let i = 0; i < cantidad; i++) {
-                        this.zombis.push(this.spawnZombi(minutos));
-                    }
-                    this.ultimoSpawn = tiempoActual;
-                }
-
-                if (this.tiempoAtaqueZombi > 0) this.tiempoAtaqueZombi--;
-
-                actualizarParticulas();
             }
 
-            dibujar() {
-                const e = ESCALA;
-                ctx.clearRect(0, 0, ANCHO, ALTO);
-
-                // Fondo
-                const grad = ctx.createLinearGradient(0, 0, 0, ALTO);
-                grad.addColorStop(0, '#0a0a1a');
-                grad.addColorStop(0.5, '#1a1a2e');
-                grad.addColorStop(1, '#0d0d1a');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, ANCHO, ALTO);
-
-                // Suelo
-                ctx.fillStyle = 'rgba(30, 30, 50, 0.5)';
-                ctx.fillRect(0, ALTO - 50*e, ANCHO, 50*e);
-                ctx.fillStyle = 'rgba(40, 40, 60, 0.3)';
-                for (let i = 0; i < ANCHO; i += 40*e) {
-                    ctx.fillRect(i, ALTO - 50*e, 1, 50*e);
+            // Balas enemigas
+            for (let i = balasEnemigas.length - 1; i >= 0; i--) {
+                const b = balasEnemigas[i];
+                b.mover();
+                if (b.x < -20 * S || b.x > W + 20 * S || b.y < -20 * S || b.y > H + 20 * S || b.vida <= 0) {
+                    balasEnemigas.splice(i, 1);
+                    continue;
                 }
-
-                // Plataformas
-                const plataformas = getPlataformas();
-                for (const p of plataformas) {
-                    ctx.fillStyle = 'rgba(60, 70, 90, 0.6)';
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                    ctx.shadowBlur = 10*e;
-                    ctx.beginPath();
-                    ctx.roundRect(p.x, p.y, p.w, p.h, 4);
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.fillStyle = 'rgba(100, 120, 150, 0.3)';
-                    ctx.fillRect(p.x + 5*e, p.y + 2*e, p.w - 10*e, 3*e);
+                if (jugador.vivo && dist(b, jugador) < b.radio + 15 * S) {
+                    jugador.recibirDaño();
+                    balasEnemigas.splice(i, 1);
+                    if (!jugador.vivo) { juego.gameOver = true; return; }
                 }
-
-                // Granadas en suelo
-                for (const g of this.granadasSuelo) {
-                    if (!g.activo) continue;
-                    ctx.shadowColor = '#FFD700';
-                    ctx.shadowBlur = 20*e;
-                    ctx.fillStyle = '#2c3e50';
-                    ctx.beginPath();
-                    ctx.arc(g.x, g.y, g.radio, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#7f8c8d';
-                    ctx.fillRect(g.x - 3*e, g.y - 14*e, 6*e, 4*e);
-                    ctx.fillStyle = '#FFD700';
-                    ctx.font = `${14*e}px Arial`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.shadowBlur = 0;
-                    ctx.fillText('💣', g.x, g.y);
-                    ctx.shadowBlur = 0;
-                }
-
-                // Corazones en suelo
-                for (const c of this.corazonesSuelo) {
-                    c.dibujar();
-                }
-
-                // Armas en suelo
-                for (const arma of this.armasSuelo) {
-                    arma.dibujar();
-                }
-
-                // Granadas
-                for (const granada of this.granadas) {
-                    granada.dibujar();
-                }
-
-                // Zombis
-                for (const zombi of this.zombis) {
-                    zombi.dibujar();
-                }
-
-                // Balas
-                for (const bala of this.balas) {
-                    bala.dibujar();
-                }
-                for (const bala of this.balasEnemigas) {
-                    bala.dibujar();
-                }
-
-                // Perro
-                if (this.perro && this.perro.vivo) {
-                    this.perro.dibujar();
-                }
-
-                // Partículas
-                dibujarParticulas();
-
-                // Jugador
-                if (this.jugador.vivo) {
-                    this.jugador.dibujar();
-                }
-
-                // UI
-                this.dibujarUI();
             }
 
-            dibujarUI() {
-                const e = ESCALA;
-                const tiempoActual = Date.now();
-                const minutos = Math.floor((tiempoActual - this.tiempoInicio) / 60000);
-                const segundos = Math.floor((tiempoActual - this.tiempoInicio) / 1000) % 60;
+            // Granadas
+            for (let i = granadas.length - 1; i >= 0; i--) {
+                const g = granadas[i];
+                g.mover();
+                if (!g.alive) { granadas.splice(i, 1); continue; }
+
+                if (!g.exploto) {
+                    for (const z of zombis) {
+                        if (g.colisiona(z)) { g.exploto = true; break; }
+                    }
+                }
+
+                if (g.exploto) {
+                    for (const z of zombis) {
+                        const d = g.getDaño(z);
+                        if (d > 0 && z.recibirDaño(d)) {
+                            juego.puntuacion += 10 + minutos;
+                            eliminadosParaCorazon++;
+                            if (eliminadosParaCorazon >= 20) {
+                                eliminadosParaCorazon = 0;
+                                const cx = z.cx + rand(-50 * S, 50 * S);
+                                const cy = z.cy + rand(-50 * S, 50 * S);
+                                corazonesSuelo.push(new CorazonSuelo(
+                                    Math.max(20 * S, Math.min(W - 20 * S, cx)),
+                                    Math.max(20 * S, Math.min(H - 80 * S, cy))
+                                ));
+                            }
+                            if (Math.random() < 0.15) {
+                                const tipos = ['escopeta', 'metralleta'];
+                                armasSuelo.push(new ArmaSuelo(z.x, z.y, tipos[randInt(0, 1)]));
+                            }
+                            crearParticulas(z.cx, z.cy, '#00E676', 20, 5);
+                        }
+                    }
+                }
+            }
+
+            // Zombis
+            for (const z of zombis) {
+                if (!z.vivo) continue;
+                z.mover(jugador);
+
+                if (dist(z, jugador) < 30 * S) {
+                    if (z.tiempoAtaque <= 0) {
+                        jugador.recibirDaño();
+                        z.tiempoAtaque = 40;
+                        if (!jugador.vivo) { juego.gameOver = true; return; }
+                    }
+                }
+
+                if (z.dispara && dist(z, jugador) < 350 * S && dist(z, jugador) > 50 * S) {
+                    z.tiempoDisparo++;
+                    if (z.tiempoDisparo > 60 + rand(0, 40)) {
+                        z.tiempoDisparo = 0;
+                        const a = Math.atan2(jugador.cy - z.cy, jugador.cx - z.cx);
+                        balasEnemigas.push(new Bala(z.cx, z.cy, a, 'pistola', true));
+                        crearParticulas(z.cx, z.cy, '#FF6B6B', 5, 2);
+                    }
+                }
+            }
+            zombis = zombis.filter(z => z.vivo);
+
+            // Armas en suelo
+            for (let i = armasSuelo.length - 1; i >= 0; i--) {
+                const a = armasSuelo[i];
+                a.timer--;
+                if (a.timer <= 0) { armasSuelo.splice(i, 1); continue; }
+                if (a.activo && dist(a, jugador) < jugador.w / 2 + a.radio + 10 * S) {
+                    if (a.tipo === 'escopeta') { jugador.arma = 'escopeta';
+                        jugador.balasEscopeta = 6; } else if (a.tipo === 'metralleta') { jugador.arma = 'metralleta';
+                        jugador.balasMetralleta = 30;
+                        jugador.recargando = false; }
+                    a.activo = false;
+                    armasSuelo.splice(i, 1);
+                    crearParticulas(a.x, a.y, '#FF9100', 20, 5);
+                }
+            }
+
+            // Spawn de zombis
+            const spawnRate = Math.max(300, 1200 - (minutos * 20));
+            spawnTimer++;
+            if (spawnTimer > spawnRate / 16) {
+                spawnTimer = 0;
+                const cantidad = Math.min(1 + Math.floor(minutos * 0.2), 8);
+                for (let i = 0; i < cantidad; i++) {
+                    zombis.push(spawnZombi());
+                }
+            }
+
+            actualizarParticulas();
+        }
+
+        // ============================================================
+        // DIBUJADO
+        // ============================================================
+        function dibujar() {
+            const s = S;
+            ctx.clearRect(0, 0, W, H);
+
+            // Fondo
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, '#0a0a1a');
+            grad.addColorStop(0.5, '#1a1a2e');
+            grad.addColorStop(1, '#0d0d1a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // Suelo
+            ctx.fillStyle = 'rgba(30,30,50,0.5)';
+            ctx.fillRect(0, H - 50 * s, W, 50 * s);
+
+            // Plataformas
+            for (const p of getPlataformas()) {
+                ctx.fillStyle = 'rgba(60,70,90,0.6)';
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 10 * s;
+                ctx.beginPath();
+                ctx.roundRect(p.x, p.y, p.w, p.h, 4);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(100,120,150,0.3)';
+                ctx.fillRect(p.x + 5 * s, p.y + 2 * s, p.w - 10 * s, 3 * s);
+            }
+
+            // Elementos
+            for (const g of granadasSuelo) {
+                if (!g.activo) continue;
+                ctx.shadowColor = '#FFD700';
+                ctx.shadowBlur = 20 * s;
+                ctx.fillStyle = '#2c3e50';
+                ctx.beginPath();
+                ctx.arc(g.x, g.y, g.radio, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#7f8c8d';
+                ctx.fillRect(g.x - 3 * s, g.y - 14 * s, 6 * s, 4 * s);
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#FFD700';
+                ctx.font = `${14*s}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('💣', g.x, g.y);
+            }
+
+            for (const c of corazonesSuelo) c.dibujar();
+            for (const a of armasSuelo) a.dibujar();
+            for (const g of granadas) g.dibujar();
+            for (const z of zombis) z.dibujar();
+            for (const b of balas) b.dibujar();
+            for (const b of balasEnemigas) b.dibujar();
+            if (perro && perro.vivo) perro.dibujar();
+            dibujarParticulas();
+            if (jugador && jugador.vivo) jugador.dibujar();
+
+            // UI
+            if (juego.jugando && !juego.gameOver) {
+                const mins = Math.floor(juego.tiempo / 60);
+                const segs = Math.floor(juego.tiempo % 60);
 
                 ctx.fillStyle = 'rgba(0,0,0,0.7)';
                 ctx.beginPath();
-                ctx.roundRect(10*e, 10*e, 320*e, 80*e, 10*e);
+                ctx.roundRect(10 * s, 10 * s, 280 * s, 70 * s, 10 * s);
                 ctx.fill();
 
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
-
                 ctx.fillStyle = '#FFD700';
-                ctx.font = `bold ${20*e}px Arial`;
-                ctx.fillText(`💀 ${this.puntuacion}`, 20*e, 15*e);
+                ctx.font = `bold ${18*s}px Arial`;
+                ctx.fillText(`💀 ${juego.puntuacion}`, 20 * s, 15 * s);
 
                 ctx.fillStyle = '#00BCD4';
-                ctx.font = `${16*e}px Arial`;
-                ctx.fillText(`⏱ ${minutos}:${segundos.toString().padStart(2, '0')}`, 120*e, 16*e);
+                ctx.font = `${14*s}px Arial`;
+                ctx.fillText(`⏱ ${mins}:${segs.toString().padStart(2,'0')}`, 110 * s, 17 * s);
 
                 ctx.fillStyle = '#FF6B6B';
-                ctx.font = `${14*e}px Arial`;
-                let armaText = `🔫 ${this.jugador.arma_actual.toUpperCase()}`;
-                if (this.jugador.arma_actual === 'escopeta') {
-                    armaText += ` (${this.jugador.balas_escopeta})`;
-                } else if (this.jugador.arma_actual === 'metralleta') {
-                    armaText += ` (${this.jugador.balas_metralleta}/${this.jugador.max_metralleta})`;
-                    if (this.jugador.recargando) armaText += ' 🔄';
-                }
-                ctx.fillText(armaText, 20*e, 45*e);
+                ctx.font = `${12*s}px Arial`;
+                let armaText = `🔫 ${jugador.arma.toUpperCase()}`;
+                if (jugador.arma === 'escopeta') armaText += ` (${jugador.balasEscopeta})`;
+                else if (jugador.arma === 'metralleta') armaText += ` (${jugador.balasMetralleta}/30)`;
+                ctx.fillText(armaText, 20 * s, 42 * s);
 
                 ctx.fillStyle = '#FFD93D';
-                ctx.font = `${14*e}px Arial`;
-                ctx.fillText(`⭐ Nivel ${minutos + 1}`, 20*e, 70*e);
+                ctx.font = `${12*s}px Arial`;
+                ctx.fillText(`⭐ Nivel ${mins+1}`, 20 * s, 60 * s);
 
                 ctx.fillStyle = '#FF6B6B';
-                ctx.font = `${14*e}px Arial`;
-                ctx.fillText(`🧟 ${this.zombis.length}`, 120*e, 70*e);
+                ctx.font = `${12*s}px Arial`;
+                ctx.fillText(`🧟 ${zombis.length}`, 110 * s, 60 * s);
+                ctx.fillText(`💣 ${jugador.granadas}`, 170 * s, 60 * s);
 
-                ctx.fillStyle = '#FF6B6B';
-                ctx.font = `${14*e}px Arial`;
-                ctx.fillText(`💣 ${this.jugador.granadas}`, 190*e, 70*e);
-
-                if (this.perro && this.perro.vivo) {
+                if (perro && perro.vivo) {
                     ctx.fillStyle = '#FFD700';
-                    ctx.font = `${14*e}px Arial`;
-                    ctx.fillText(`🐕‍🦺 REX`, 260*e, 70*e);
+                    ctx.font = `${12*s}px Arial`;
+                    ctx.fillText('🐕 REX', 230 * s, 60 * s);
                 }
-
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = `${12*e}px Arial`;
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'top';
-                ctx.fillText(`❤️ ${20 - this.eliminadosParaCorazon}`, ANCHO - 20*e, 50*e);
 
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = 'rgba(255,215,0,0.5)';
-                ctx.font = `${14*e}px Arial`;
-                ctx.fillText(`🏆 Récord: ${puntajeMaximo}`, ANCHO - 20*e, 15*e);
+                ctx.font = `${12*s}px Arial`;
+                ctx.fillText(`🏆 ${juego.record}`, W - 20 * s, 15 * s);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.font = `${10*s}px Arial`;
+                ctx.fillText(`❤️ ${20-eliminadosParaCorazon}`, W - 20 * s, 40 * s);
             }
 
-            buclePrincipal() {
-                if (!this.juegoTerminado) {
-                    this.actualizar();
-                    this.dibujar();
-                    requestAnimationFrame(() => this.buclePrincipal());
-                } else {
-                    this.mostrarGameOver();
-                }
+            // Menú
+            if (juego.menu) dibujarMenu();
+
+            // Game Over
+            if (juego.gameOver) dibujarGameOver();
+        }
+
+        function dibujarMenu() {
+            const s = S;
+            const grad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 500 * s);
+            grad.addColorStop(0, '#1a1a3e');
+            grad.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            ctx.shadowColor = 'rgba(255,0,0,0.3)';
+            ctx.shadowBlur = 30 * s;
+            ctx.fillStyle = '#FF1744';
+            ctx.font = `bold ${45*s}px Arial`;
+            ctx.fillText('🧟 ZOMBIE SURVIVOR', W / 2, 60 * s);
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = `${16*s}px Arial`;
+            ctx.fillText('📋 COMANDOS:', W / 2, 120 * s);
+
+            ctx.fillStyle = '#aaa';
+            ctx.font = `${13*s}px Arial`;
+            ctx.fillText('🎮 WASD / Flechas: Moverse   |   🖱️ Click: Disparar', W / 2, 150 * s);
+            ctx.fillText('⬆ / W: Saltar (doble salto)   |   G: Lanzar granada', W / 2, 175 * s);
+            ctx.fillText('E / Q: Cambiar arma', W / 2, 200 * s);
+
+            ctx.fillStyle = '#FFD700';
+            ctx.font = `bold ${20*s}px Arial`;
+            ctx.fillText('💀 ¿Estás listo para la invasión zombi?', W / 2, 255 * s);
+            ctx.fillStyle = '#FF1744';
+            ctx.font = `${16*s}px Arial`;
+            ctx.fillText('¡Suerte la vas a necesitar!', W / 2, 285 * s);
+
+            if (juego.record > 0) {
+                ctx.fillStyle = '#FFD700';
+                ctx.font = `${14*s}px Arial`;
+                ctx.fillText(`🏆 Récord: ${juego.record}`, W / 2, 330 * s);
             }
 
-            mostrarGameOver() {
-                const e = ESCALA;
-                const esRecord = this.puntuacion > puntajeMaximo;
-                if (esRecord) {
-                    puntajeMaximo = this.puntuacion;
-                    localStorage.setItem('zombiePuntajeMaximo', String(puntajeMaximo));
-                }
+            ctx.fillStyle = '#aaa';
+            ctx.font = `${14*s}px Arial`;
+            ctx.fillText('🎯 Elige tu personaje:', W / 2, 380 * s);
 
-                let esperando = true;
+            const bx = W / 2 - 190 * s;
+            const by = 410 * s;
+            const bw = 170 * s;
+            const bh = 55 * s;
 
-                const drawGameOver = () => {
-                    ctx.clearRect(0, 0, ANCHO, ALTO);
-                    ctx.fillStyle = 'rgba(0,0,0,0.85)';
-                    ctx.fillRect(0, 0, ANCHO, ALTO);
+            ctx.shadowColor = 'rgba(0,0,255,0.3)';
+            ctx.shadowBlur = 20 * s;
 
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
+            const gradH = ctx.createLinearGradient(bx, by, bx, by + bh);
+            gradH.addColorStop(0, '#4488FF');
+            gradH.addColorStop(1, '#0044AA');
+            ctx.fillStyle = gradH;
+            ctx.beginPath();
+            ctx.roundRect(bx, by, bw, bh, 12);
+            ctx.fill();
 
-                    ctx.fillStyle = C.ROJO;
-                    ctx.font = `bold ${60*e}px Arial`;
-                    ctx.fillText('💀 GAME OVER', ANCHO / 2, 140*e);
+            const gradM = ctx.createLinearGradient(bx + bw + 20 * s, by, bx + bw + 20 * s, by + bh);
+            gradM.addColorStop(0, '#FF6B9D');
+            gradM.addColorStop(1, '#CC3388');
+            ctx.fillStyle = gradM;
+            ctx.beginPath();
+            ctx.roundRect(bx + bw + 20 * s, by, bw, bh, 12);
+            ctx.fill();
 
-                    ctx.fillStyle = C.BLANCO;
-                    ctx.font = `${36*e}px Arial`;
-                    ctx.fillText(`Puntuación: ${this.puntuacion}`, ANCHO / 2, 220*e);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${18*s}px Arial`;
+            ctx.fillText('👨 Hombre', bx + bw / 2, by + bh / 2);
+            ctx.fillText('👩 Mujer', bx + bw + 20 * s + bw / 2, by + bh / 2);
 
-                    if (esRecord) {
-                        ctx.fillStyle = '#FFD700';
-                        ctx.font = `bold ${32*e}px Arial`;
-                        ctx.fillText('🏆 ¡NUEVO RÉCORD!', ANCHO / 2, 280*e);
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.font = `${10*s}px Arial`;
+            ctx.fillText('🐕 Perro policía (Rex) aparece a los 2 minutos', W / 2, H - 30 * s);
+
+            // Detectar clic en botones
+            if (juego.menu) {
+                const handler = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    let x, y;
+                    if (e.type === 'touchstart') {
+                        const touch = e.touches[0];
+                        x = touch.clientX - rect.left;
+                        y = touch.clientY - rect.top;
                     } else {
-                        ctx.fillStyle = C.GRIS;
-                        ctx.font = `${24*e}px Arial`;
-                        ctx.fillText(`Récord: ${puntajeMaximo}`, ANCHO / 2, 280*e);
+                        x = e.clientX - rect.left;
+                        y = e.clientY - rect.top;
                     }
-
-                    ctx.fillStyle = C.GRIS;
-                    ctx.font = `${18*e}px Arial`;
-                    const minutos = Math.floor((Date.now() - this.tiempoInicio) / 60000);
-                    const segundos = Math.floor((Date.now() - this.tiempoInicio) / 1000) % 60;
-                    ctx.fillText(`⏱ Tiempo: ${minutos}:${segundos.toString().padStart(2, '0')}`, ANCHO / 2, 330*e);
-                    ctx.fillText(`🔫 Zombis derrotados: ${this.puntuacion}`, ANCHO / 2, 360*e);
-                    ctx.fillText(`❤️ Corazones recuperados: ${this.corazonesRecogidos}`, ANCHO / 2, 390*e);
-
-                    const btnX = ANCHO / 2 - 120*e;
-                    const btnY = 430*e;
-                    const btnW = 240*e;
-                    const btnH = 55*e;
-
-                    ctx.shadowColor = 'rgba(0,0,255,0.3)';
-                    ctx.shadowBlur = 20*e;
-
-                    const grad = ctx.createLinearGradient(btnX, btnY, btnX, btnY + btnH);
-                    grad.addColorStop(0, '#2979FF');
-                    grad.addColorStop(1, '#0D47A1');
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.roundRect(btnX, btnY, btnW, btnH, 12);
-                    ctx.fill();
-
-                    ctx.shadowBlur = 0;
-
-                    ctx.fillStyle = C.BLANCO;
-                    ctx.font = `bold ${24*e}px Arial`;
-                    ctx.fillText('🔄 VOLVER A JUGAR', ANCHO / 2, btnY + btnH / 2);
-
-                    if (esperando) {
-                        const handler = () => {
-                            esperando = false;
-                            canvas.removeEventListener('click', handler);
-                            canvas.removeEventListener('touchstart', handler);
-                            this.mostrarMenu();
-                        };
-                        canvas.addEventListener('click', handler);
-                        canvas.addEventListener('touchstart', handler);
-
-                        const keyHandler = (e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                esperando = false;
-                                document.removeEventListener('keydown', keyHandler);
-                                this.mostrarMenu();
-                            }
-                        };
-                        document.addEventListener('keydown', keyHandler);
+                    if (x > bx && x < bx + bw && y > by && y < by + bh) {
+                        juego.menu = false;
+                        canvas.removeEventListener('click', handler);
+                        canvas.removeEventListener('touchstart', handler);
+                        reiniciarJuego('hombre');
+                        iniciarMusica();
+                    } else if (x > bx + bw + 20 * s && x < bx + 2 * bw + 20 * s && y > by && y < by + bh) {
+                        juego.menu = false;
+                        canvas.removeEventListener('click', handler);
+                        canvas.removeEventListener('touchstart', handler);
+                        reiniciarJuego('mujer');
+                        iniciarMusica();
                     }
                 };
-
-                drawGameOver();
-            }
-
-            mostrarMenu() {
-                const e = ESCALA;
-                enMenu = true;
-
-                const drawMenu = () => {
-                    ctx.clearRect(0, 0, ANCHO, ALTO);
-
-                    const grad = ctx.createRadialGradient(ANCHO / 2, ALTO / 2, 0, ANCHO / 2, ALTO / 2, 500*e);
-                    grad.addColorStop(0, '#1a1a3e');
-                    grad.addColorStop(1, '#0a0a0a');
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(0, 0, ANCHO, ALTO);
-
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-
-                    ctx.shadowColor = 'rgba(255,0,0,0.3)';
-                    ctx.shadowBlur = 30*e;
-
-                    ctx.fillStyle = C.ROJO;
-                    ctx.font = `bold ${50*e}px Arial`;
-                    ctx.fillText('🧟 ZOMBIE SURVIVOR', ANCHO / 2, 60*e);
-
-                    ctx.shadowBlur = 0;
-
-                    ctx.fillStyle = C.BLANCO;
-                    ctx.font = `${18*e}px Arial`;
-                    ctx.fillText('📋 COMANDOS:', ANCHO / 2, 120*e);
-
-                    ctx.fillStyle = C.GRIS;
-                    ctx.font = `${14*e}px Arial`;
-                    ctx.fillText('🎮 WASD / Flechas: Moverse   |   🖱️ Click: Disparar', ANCHO / 2, 155*e);
-                    ctx.fillText('⬆ / W: Saltar (doble salto)   |   G: Lanzar granada', ANCHO / 2, 180*e);
-                    ctx.fillText('E / Q: Cambiar arma   |   📱 Toca pantalla para apuntar', ANCHO / 2, 205*e);
-
-                    ctx.fillStyle = '#FFD700';
-                    ctx.font = `bold ${22*e}px Arial`;
-                    ctx.fillText('💀 ¿Estás listo para la invasión zombi?', ANCHO / 2, 260*e);
-                    ctx.fillStyle = C.ROJO;
-                    ctx.font = `${18*e}px Arial`;
-                    ctx.fillText('¡Suerte la vas a necesitar!', ANCHO / 2, 295*e);
-
-                    if (puntajeMaximo > 0) {
-                        ctx.fillStyle = '#FFD700';
-                        ctx.font = `${16*e}px Arial`;
-                        ctx.fillText(`🏆 Récord: ${puntajeMaximo}`, ANCHO / 2, 340*e);
-                    }
-
-                    ctx.fillStyle = C.GRIS;
-                    ctx.font = `${16*e}px Arial`;
-                    ctx.fillText('🎯 Elige tu personaje:', ANCHO / 2, 390*e);
-
-                    const btnHombre = { x: ANCHO / 2 - 180*e, y: 420*e, w: 160*e, h: 60*e };
-                    const btnMujer = { x: ANCHO / 2 + 20*e, y: 420*e, w: 160*e, h: 60*e };
-
-                    ctx.shadowColor = 'rgba(0,0,255,0.3)';
-                    ctx.shadowBlur = 20*e;
-
-                    const gradH = ctx.createLinearGradient(btnHombre.x, btnHombre.y, btnHombre.x, btnHombre.y + btnHombre.h);
-                    gradH.addColorStop(0, '#4488FF');
-                    gradH.addColorStop(1, '#0044AA');
-                    ctx.fillStyle = gradH;
-                    ctx.beginPath();
-                    ctx.roundRect(btnHombre.x, btnHombre.y, btnHombre.w, btnHombre.h, 15);
-                    ctx.fill();
-
-                    const gradM = ctx.createLinearGradient(btnMujer.x, btnMujer.y, btnMujer.x, btnMujer.y + btnMujer.h);
-                    gradM.addColorStop(0, '#FF6B9D');
-                    gradM.addColorStop(1, '#CC3388');
-                    ctx.fillStyle = gradM;
-                    ctx.beginPath();
-                    ctx.roundRect(btnMujer.x, btnMujer.y, btnMujer.w, btnMujer.h, 15);
-                    ctx.fill();
-
-                    ctx.shadowBlur = 0;
-
-                    ctx.fillStyle = C.BLANCO;
-                    ctx.font = `bold ${22*e}px Arial`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-
-                    ctx.fillText('👨 Hombre', btnHombre.x + btnHombre.w / 2, btnHombre.y + btnHombre.h / 2);
-                    ctx.fillText('👩 Mujer', btnMujer.x + btnMujer.w / 2, btnMujer.y + btnMujer.h / 2);
-
-                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
-                    ctx.font = `${12*e}px Arial`;
-                    ctx.fillText('🐕‍🦺 Perro policía (Rex) aparece a los 2 minutos', ANCHO / 2, ALTO - 40*e);
-
-                    if (enMenu) {
-                        const handler = (e) => {
-                            const rect = canvas.getBoundingClientRect();
-                            let x, y;
-                            if (e.type === 'touchstart') {
-                                const touch = e.touches[0];
-                                x = touch.clientX - rect.left;
-                                y = touch.clientY - rect.top;
-                            } else {
-                                x = e.clientX - rect.left;
-                                y = e.clientY - rect.top;
-                            }
-
-                            if (x > btnHombre.x && x < btnHombre.x + btnHombre.w &&
-                                y > btnHombre.y && y < btnHombre.y + btnHombre.h) {
-                                enMenu = false;
-                                canvas.removeEventListener('click', handler);
-                                canvas.removeEventListener('touchstart', handler);
-                                juegoActual = new Juego('hombre');
-                            } else if (x > btnMujer.x && x < btnMujer.x + btnMujer.w &&
-                                y > btnMujer.y && y < btnMujer.y + btnMujer.h) {
-                                enMenu = false;
-                                canvas.removeEventListener('click', handler);
-                                canvas.removeEventListener('touchstart', handler);
-                                juegoActual = new Juego('mujer');
-                            }
-                        };
-                        canvas.addEventListener('click', handler);
-                        canvas.addEventListener('touchstart', handler);
-                    }
-                };
-
-                drawMenu();
+                canvas.addEventListener('click', handler);
+                canvas.addEventListener('touchstart', handler);
             }
         }
 
-        // ==================== POLYFILL ROUNDRECT ====================
+        function dibujarGameOver() {
+            const s = S;
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            ctx.fillStyle = '#FF1744';
+            ctx.font = `bold ${55*s}px Arial`;
+            ctx.fillText('💀 GAME OVER', W / 2, 130 * s);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = `${30*s}px Arial`;
+            ctx.fillText(`Puntuación: ${juego.puntuacion}`, W / 2, 200 * s);
+
+            const esRecord = juego.puntuacion > juego.record;
+            if (esRecord) {
+                juego.record = juego.puntuacion;
+                localStorage.setItem('zombieRecord', String(juego.record));
+                ctx.fillStyle = '#FFD700';
+                ctx.font = `bold ${28*s}px Arial`;
+                ctx.fillText('🏆 ¡NUEVO RÉCORD!', W / 2, 255 * s);
+            } else {
+                ctx.fillStyle = '#aaa';
+                ctx.font = `${20*s}px Arial`;
+                ctx.fillText(`Récord: ${juego.record}`, W / 2, 255 * s);
+            }
+
+            ctx.fillStyle = '#aaa';
+            ctx.font = `${16*s}px Arial`;
+            const mins = Math.floor(juego.tiempo / 60);
+            const segs = Math.floor(juego.tiempo % 60);
+            ctx.fillText(`⏱ Tiempo: ${mins}:${segs.toString().padStart(2,'0')}`, W / 2, 305 * s);
+            ctx.fillText(`🔫 Zombis derrotados: ${juego.puntuacion}`, W / 2, 335 * s);
+
+            const btnX = W / 2 - 110 * s;
+            const btnY = 385 * s;
+            const btnW = 220 * s;
+            const btnH = 50 * s;
+
+            ctx.shadowColor = 'rgba(0,0,255,0.3)';
+            ctx.shadowBlur = 20 * s;
+            const grad = ctx.createLinearGradient(btnX, btnY, btnX, btnY + btnH);
+            grad.addColorStop(0, '#2979FF');
+            grad.addColorStop(1, '#0D47A1');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.roundRect(btnX, btnY, btnW, btnH, 12);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${20*s}px Arial`;
+            ctx.fillText('🔄 VOLVER A JUGAR', W / 2, btnY + btnH / 2);
+
+            // Detectar clic en botón
+            const handler = () => {
+                canvas.removeEventListener('click', handler);
+                canvas.removeEventListener('touchstart', handler);
+                juego.gameOver = false;
+                juego.menu = true;
+            };
+            canvas.addEventListener('click', handler);
+            canvas.addEventListener('touchstart', handler);
+        }
+
+        // ============================================================
+        // EVENTOS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            teclas[key] = true;
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+            if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && jugador) jugador.saltar();
+            if (e.key === 'g' && jugador) {
+                const g = jugador.lanzarGranada(mouseX, mouseY);
+                if (g) granadas.push(g);
+            }
+            if ((e.key === 'e' || e.key === 'q') && jugador) jugador.cambiarArma();
+        });
+
+        document.addEventListener('keyup', (e) => {
+            teclas[e.key.toLowerCase()] = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                mousePresionado = true;
+                if (jugador && jugador.vivo && !juego.gameOver && !juego.menu) disparar();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => { mousePresionado = false; });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            if (touch) {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = touch.clientX - rect.left;
+                mouseY = touch.clientY - rect.top;
+                mousePresionado = true;
+                if (jugador && jugador.vivo && !juego.gameOver && !juego.menu) disparar();
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            if (touch) {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = touch.clientX - rect.left;
+                mouseY = touch.clientY - rect.top;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            mousePresionado = false;
+        }, { passive: false });
+
+        // Disparo continuo
+        setInterval(() => {
+            if (mousePresionado && jugador && jugador.vivo && !juego.gameOver && !juego.menu) {
+                disparar();
+            }
+        }, 80);
+
+        // ============================================================
+        // POLYFILL
+        // ============================================================
         if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
-                const r = typeof radii === 'number' ? radii : (radii || 0);
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                r = typeof r === 'number' ? r : (r || 0);
                 this.moveTo(x + r, y);
                 this.lineTo(x + w - r, y);
                 this.quadraticCurveTo(x + w, y, x + w, y + r);
@@ -2368,13 +1780,20 @@
             };
         }
 
-        // ==================== INICIAR ====================
-        resizeCanvas();
-        iniciarMusica();
-        
-        // Crear el juego pero mostrar el menú PRIMERO
-        juegoActual = new Juego('hombre');
-        juegoActual.mostrarMenu();
+        // ============================================================
+        // BUCLE PRINCIPAL
+        // ============================================================
+        function loop() {
+            actualizar();
+            dibujar();
+            requestAnimationFrame(loop);
+        }
+
+        // ============================================================
+        // INICIAR
+        // ============================================================
+        juego.menu = true;
+        loop();
     </script>
 </body>
 </html>
