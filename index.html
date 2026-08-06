@@ -50,12 +50,24 @@
             font-size: 12px;
             cursor: pointer;
         }
+        #info {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 11px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         <button id="musicToggle">🔊 Música</button>
+        <div id="info">Click izquierdo: Disparar | Click derecho: Granada | WASD: Moverse | Espacio: Saltar</div>
     </div>
 
     <script>
@@ -138,19 +150,30 @@
         }
 
         // ============================================================
-        // PLATAFORMAS (escaladas)
+        // PLATAFORMAS (escaladas) - MÁS COMPLETAS
         // ============================================================
         function getPlataformas() {
             const s = S;
             return [
-                { x: 80 * s, y: 460 * s, w: 150 * s, h: 10 * s },
-                { x: 350 * s, y: 460 * s, w: 150 * s, h: 10 * s },
-                { x: 600 * s, y: 460 * s, w: 150 * s, h: 10 * s },
-                { x: 200 * s, y: 350 * s, w: 130 * s, h: 10 * s },
-                { x: 480 * s, y: 350 * s, w: 130 * s, h: 10 * s },
-                { x: 80 * s, y: 240 * s, w: 110 * s, h: 10 * s },
-                { x: 350 * s, y: 240 * s, w: 110 * s, h: 10 * s },
-                { x: 620 * s, y: 240 * s, w: 110 * s, h: 10 * s }
+                // Piso principal
+                { x: 0, y: H - 50 * s, w: W, h: 10 * s },
+                // Nivel 1 (abajo)
+                { x: 60 * s, y: 460 * s, w: 140 * s, h: 10 * s },
+                { x: 250 * s, y: 460 * s, w: 140 * s, h: 10 * s },
+                { x: 440 * s, y: 460 * s, w: 140 * s, h: 10 * s },
+                { x: 630 * s, y: 460 * s, w: 140 * s, h: 10 * s },
+                // Nivel 2 (medio)
+                { x: 30 * s, y: 350 * s, w: 120 * s, h: 10 * s },
+                { x: 190 * s, y: 350 * s, w: 120 * s, h: 10 * s },
+                { x: 350 * s, y: 350 * s, w: 120 * s, h: 10 * s },
+                { x: 510 * s, y: 350 * s, w: 120 * s, h: 10 * s },
+                { x: 670 * s, y: 350 * s, w: 120 * s, h: 10 * s },
+                // Nivel 3 (arriba)
+                { x: 60 * s, y: 240 * s, w: 100 * s, h: 10 * s },
+                { x: 210 * s, y: 240 * s, w: 100 * s, h: 10 * s },
+                { x: 360 * s, y: 240 * s, w: 100 * s, h: 10 * s },
+                { x: 510 * s, y: 240 * s, w: 100 * s, h: 10 * s },
+                { x: 660 * s, y: 240 * s, w: 100 * s, h: 10 * s }
             ];
         }
 
@@ -167,6 +190,11 @@
 
         function randInt(min, max) {
             return Math.floor(rand(min, max + 1));
+        }
+
+        function colisionRect(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x &&
+                a.y < b.y + b.h && a.y + a.h > b.y;
         }
 
         // ============================================================
@@ -244,6 +272,7 @@
                 this.tiempoFrame = 0;
                 this.recargando = false;
                 this.tiempoRecarga = 0;
+                this.tiempoAtaque = 0;
             }
 
             get cx() { return this.x + this.w / 2; }
@@ -288,11 +317,13 @@
                     }
                 }
 
-                if (this.y + this.h >= H - 50 * s) {
-                    this.y = H - 50 * s - this.h;
+                // Si cae al vacío, reaparece en el piso principal
+                if (this.y > H) {
+                    this.y = H - 100 * s;
                     this.vy = 0;
-                    this.enSuelo = true;
-                    this.saltos = 2;
+                    this.vidas--;
+                    if (this.vidas <= 0) { this.vivo = false; }
+                    this.invulnerable = 60;
                 }
 
                 this.x = Math.max(0, Math.min(W - this.w, this.x));
@@ -309,6 +340,7 @@
                 }
 
                 if (this.invulnerable > 0) this.invulnerable--;
+                if (this.tiempoAtaque > 0) this.tiempoAtaque--;
 
                 if (this.recargando) {
                     this.tiempoRecarga++;
@@ -367,9 +399,10 @@
             }
 
             recibirDaño() {
-                if (this.invulnerable > 0) return false;
+                if (this.invulnerable > 0 || this.tiempoAtaque > 0) return false;
                 this.vidas--;
                 this.invulnerable = 60;
+                this.tiempoAtaque = 20;
                 crearParticulas(this.cx, this.cy, '#ff1744', 20, 5);
                 if (this.vidas <= 0) { this.vidas = 0;
                     this.vivo = false; }
@@ -405,7 +438,6 @@
                     ctx.fillStyle = '#2c1810';
                     ctx.fillRect(x + 4 * s, y + 2 * s, 22 * s, 5 * s);
                     ctx.fillRect(x + 6 * s, y + 1 * s, 18 * s, 4 * s);
-                    // Anteojos
                     ctx.strokeStyle = '#1a1a1a';
                     ctx.lineWidth = 2 * s;
                     ctx.beginPath();
@@ -433,12 +465,10 @@
                     ctx.quadraticCurveTo(x + 30 * s, y + 16 * s, x + 26 * s, y + 28 * s);
                     ctx.quadraticCurveTo(x + 22 * s, y + 32 * s, x + 18 * s, y + 28 * s);
                     ctx.fill();
-                    // Moño
                     ctx.fillStyle = '#E91E63';
                     ctx.beginPath();
                     ctx.arc(x + this.w / 2 + 12 * s * this.mirando, y + 2 * s, 4 * s, 0, Math.PI * 2);
                     ctx.fill();
-                    // Ojos grandes
                     const ox = x + this.w / 2 + (this.mirando > 0 ? 4 * s : -4 * s);
                     ctx.fillStyle = '#fff';
                     ctx.beginPath();
@@ -468,7 +498,6 @@
                 const bx = x + (this.mirando > 0 ? this.w : -8 * s);
                 ctx.fillRect(bx - 3 * s, by, 6 * s, 14 * s);
 
-                // Arma
                 const mx2 = bx + (this.mirando > 0 ? 3 * s : -3 * s);
                 const my2 = by + 12 * s;
                 ctx.save();
@@ -647,7 +676,6 @@
                 ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 9 * s : -9 * s), y + 5 * s, 1.5 * s, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Orejas
                 ctx.fillStyle = '#6D4C41';
                 ctx.beginPath();
                 ctx.arc(x + this.w / 2 + (this.mirando > 0 ? -2 * s : 2 * s), y + 1 * s, 5 * s, 0, Math.PI * 2);
@@ -656,18 +684,15 @@
                 ctx.arc(x + this.w / 2 + (this.mirando > 0 ? 6 * s : -6 * s), y + 1 * s, 5 * s, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Collar
                 ctx.fillStyle = '#D32F2F';
                 ctx.fillRect(x + 4 * s, y + 10 * s, 17 * s, 3 * s);
 
-                // Patas
                 ctx.fillStyle = '#6D4C41';
                 const paso = this.frame * 0.3;
                 ctx.fillRect(x + 3 * s, y + 18 * s + Math.sin(paso) * 2 * s, 4 * s, 6 * s);
                 ctx.fillRect(x + 9 * s, y + 18 * s + Math.sin(paso + Math.PI) * 2 * s, 4 * s, 6 * s);
                 ctx.fillRect(x + 15 * s, y + 18 * s + Math.sin(paso + Math.PI * 0.5) * 2 * s, 4 * s, 6 * s);
 
-                // Cola
                 ctx.strokeStyle = '#8D6E63';
                 ctx.lineWidth = 3 * s;
                 const cx2 = this.mirando > 0 ? x : x + this.w;
@@ -702,8 +727,10 @@
                 this.tipo = 'normal';
                 this.dispara = false;
                 this.tiempoDisparo = 0;
+                this.tiempoAtaque = 0;
                 this.frame = 0;
                 this.tiempoFrame = 0;
+                this.dañoContacto = 1 + Math.floor(nivel / 3);
             }
 
             get cx() { return this.x + this.w / 2; }
@@ -747,6 +774,7 @@
                 this.tiempoFrame += 0.1;
                 if (this.tiempoFrame > 1) { this.tiempoFrame = 0;
                     this.frame = (this.frame + 1) % 4; }
+                if (this.tiempoAtaque > 0) this.tiempoAtaque--;
             }
 
             dibujar() {
@@ -909,6 +937,7 @@
                 this.explosionR = 0;
                 this.maxR = 130 * s;
                 this.timerExp = 0;
+                this.daño = 8;
             }
 
             mover() {
@@ -986,7 +1015,7 @@
             getDaño(zombi) {
                 if (!this.exploto) return 0;
                 const d = dist(this, zombi);
-                if (d < this.explosionR) return Math.floor(8 * (1 - d / this.explosionR));
+                if (d < this.explosionR) return Math.floor(this.daño * (1 - d / this.explosionR));
                 return 0;
             }
         }
@@ -1000,7 +1029,7 @@
                 this.tipo = tipo;
                 this.radio = 14 * s;
                 this.activo = true;
-                this.timer = 600;
+                this.timer = 600; // 10 segundos
                 this.flotando = 0;
                 this.tiempo = 0;
             }
@@ -1020,6 +1049,11 @@
                 if (!this.activo || this.timer <= 0) return;
                 this.tiempo++;
                 this.flotando = Math.sin(this.tiempo * 0.05) * 4 * s;
+
+                // Parpadeo cuando está por desaparecer
+                if (this.timer < 60 && Math.floor(this.timer / 6) % 2 === 0) {
+                    ctx.globalAlpha = 0.4;
+                }
 
                 ctx.save();
                 ctx.shadowColor = 'rgba(255,165,0,0.5)';
@@ -1048,6 +1082,7 @@
                 ctx.textBaseline = 'top';
                 ctx.fillText(this.tipo.toUpperCase(), this.x, this.y + this.flotando + this.radio + 4 * s);
                 ctx.restore();
+                ctx.globalAlpha = 1;
             }
         }
 
@@ -1058,7 +1093,7 @@
                 this.y = y;
                 this.radio = 15 * s;
                 this.activo = true;
-                this.timer = 600;
+                this.timer = 600; // 10 segundos
                 this.flotando = 0;
                 this.tiempo = 0;
             }
@@ -1068,6 +1103,10 @@
                 if (!this.activo || this.timer <= 0) return;
                 this.tiempo++;
                 this.flotando = Math.sin(this.tiempo * 0.05) * 4 * s;
+
+                if (this.timer < 60 && Math.floor(this.timer / 6) % 2 === 0) {
+                    ctx.globalAlpha = 0.4;
+                }
 
                 ctx.save();
                 ctx.shadowColor = 'rgba(255,0,0,0.5)';
@@ -1084,6 +1123,7 @@
                 ctx.textBaseline = 'top';
                 ctx.fillText('+1 VIDA', this.x, this.y + this.flotando + 18 * s);
                 ctx.restore();
+                ctx.globalAlpha = 1;
             }
         }
 
@@ -1103,6 +1143,7 @@
         let mouseX = 0,
             mouseY = 0;
         let mousePresionado = false;
+        let mouseDerecho = false;
         let disparoCooldown = 0;
         let spawnTimer = 0;
         let granadaSueloTimer = 0;
@@ -1133,6 +1174,7 @@
             juego.jugando = true;
             juego.menu = false;
             mousePresionado = false;
+            mouseDerecho = false;
             disparoCooldown = 0;
             spawnTimer = 0;
             granadaSueloTimer = 0;
@@ -1171,6 +1213,12 @@
                 const a = Math.atan2(mouseY - jugador.cy, mouseX - jugador.cx);
                 crearParticulas(jugador.cx + Math.cos(a) * 25 * S, jugador.cy + Math.sin(a) * 25 * S, '#FFD700', 5, 2);
             }
+        }
+
+        function lanzarGranada() {
+            if (!jugador || !jugador.vivo) return;
+            const g = jugador.lanzarGranada(mouseX, mouseY);
+            if (g) granadas.push(g);
         }
 
         function actualizar() {
@@ -1218,7 +1266,8 @@
                     x: 50 * S + rand(0, W - 100 * S),
                     y: 50 * S + rand(0, H - 150 * S),
                     radio: 12 * S,
-                    activo: true
+                    activo: true,
+                    timer: 600
                 });
                 crearParticulas(granadasSuelo[granadasSuelo.length - 1].x, granadasSuelo[granadasSuelo.length - 1].y, '#FFD700', 10, 3);
             }
@@ -1226,6 +1275,8 @@
             // Recoger granadas
             for (let i = granadasSuelo.length - 1; i >= 0; i--) {
                 const g = granadasSuelo[i];
+                g.timer--;
+                if (g.timer <= 0) { granadasSuelo.splice(i, 1); continue; }
                 if (!g.activo) { granadasSuelo.splice(i, 1); continue; }
                 if (dist(g, jugador) < 35 * S) {
                     if (jugador.granadas < jugador.maxGranadas) {
@@ -1237,9 +1288,11 @@
                 }
             }
 
-            // Recoger corazones
+            // Recoger corazones (con temporizador)
             for (let i = corazonesSuelo.length - 1; i >= 0; i--) {
                 const c = corazonesSuelo[i];
+                c.timer--;
+                if (c.timer <= 0) { corazonesSuelo.splice(i, 1); continue; }
                 if (!c.activo) { corazonesSuelo.splice(i, 1); continue; }
                 if (dist(c, jugador) < 30 * S) {
                     if (jugador.vidas < jugador.maxVidas) {
@@ -1251,7 +1304,24 @@
                 }
             }
 
-            // Balas del jugador
+            // Armas en suelo (con temporizador)
+            for (let i = armasSuelo.length - 1; i >= 0; i--) {
+                const a = armasSuelo[i];
+                a.timer--;
+                if (a.timer <= 0) { armasSuelo.splice(i, 1); continue; }
+                if (!a.activo) { armasSuelo.splice(i, 1); continue; }
+                if (dist(a, jugador) < jugador.w / 2 + a.radio + 10 * S) {
+                    if (a.tipo === 'escopeta') { jugador.arma = 'escopeta';
+                        jugador.balasEscopeta = 6; } else if (a.tipo === 'metralleta') { jugador.arma = 'metralleta';
+                        jugador.balasMetralleta = 30;
+                        jugador.recargando = false; }
+                    a.activo = false;
+                    armasSuelo.splice(i, 1);
+                    crearParticulas(a.x, a.y, '#FF9100', 20, 5);
+                }
+            }
+
+            // Balas del jugador - DAÑO A ZOMBIS
             for (let i = balas.length - 1; i >= 0; i--) {
                 const b = balas[i];
                 b.mover();
@@ -1259,10 +1329,11 @@
                     balas.splice(i, 1);
                     continue;
                 }
-                // Colisión con zombis
+                let balaUsada = false;
                 for (const z of zombis) {
                     if (!z.vivo) continue;
-                    if (dist(b, z) < b.radio + 16 * S) {
+                    // Colisión con el zombi (cuerpo completo, no solo cabeza)
+                    if (b.x > z.x && b.x < z.x + z.w && b.y > z.y && b.y < z.y + z.h) {
                         if (z.recibirDaño(b.daño)) {
                             juego.puntuacion += 5 + Math.floor(minutos * 0.5);
                             eliminadosParaCorazon++;
@@ -1282,12 +1353,14 @@
                             crearParticulas(z.cx, z.cy, '#00E676', 20, 5);
                         }
                         balas.splice(i, 1);
+                        balaUsada = true;
                         break;
                     }
                 }
+                if (balaUsada) continue;
             }
 
-            // Balas enemigas
+            // Balas enemigas - DAÑO AL JUGADOR
             for (let i = balasEnemigas.length - 1; i >= 0; i--) {
                 const b = balasEnemigas[i];
                 b.mover();
@@ -1295,10 +1368,14 @@
                     balasEnemigas.splice(i, 1);
                     continue;
                 }
-                if (jugador.vivo && dist(b, jugador) < b.radio + 15 * S) {
-                    jugador.recibirDaño();
-                    balasEnemigas.splice(i, 1);
-                    if (!jugador.vivo) { juego.gameOver = true; return; }
+                if (jugador.vivo) {
+                    // Colisión con el jugador (cuerpo completo)
+                    if (b.x > jugador.x && b.x < jugador.x + jugador.w &&
+                        b.y > jugador.y && b.y < jugador.y + jugador.h) {
+                        jugador.recibirDaño();
+                        balasEnemigas.splice(i, 1);
+                        if (!jugador.vivo) { juego.gameOver = true; return; }
+                    }
                 }
             }
 
@@ -1339,13 +1416,15 @@
                 }
             }
 
-            // Zombis
+            // Zombis - DAÑO AL JUGADOR POR CONTACTO
             for (const z of zombis) {
                 if (!z.vivo) continue;
                 z.mover(jugador);
 
-                if (dist(z, jugador) < 30 * S) {
-                    if (z.tiempoAtaque <= 0) {
+                // Colisión con el jugador (cuerpo completo)
+                if (z.x < jugador.x + jugador.w && z.x + z.w > jugador.x &&
+                    z.y < jugador.y + jugador.h && z.y + z.h > jugador.y) {
+                    if (z.tiempoAtaque <= 0 && jugador.tiempoAtaque <= 0) {
                         jugador.recibirDaño();
                         z.tiempoAtaque = 40;
                         if (!jugador.vivo) { juego.gameOver = true; return; }
@@ -1363,22 +1442,6 @@
                 }
             }
             zombis = zombis.filter(z => z.vivo);
-
-            // Armas en suelo
-            for (let i = armasSuelo.length - 1; i >= 0; i--) {
-                const a = armasSuelo[i];
-                a.timer--;
-                if (a.timer <= 0) { armasSuelo.splice(i, 1); continue; }
-                if (a.activo && dist(a, jugador) < jugador.w / 2 + a.radio + 10 * S) {
-                    if (a.tipo === 'escopeta') { jugador.arma = 'escopeta';
-                        jugador.balasEscopeta = 6; } else if (a.tipo === 'metralleta') { jugador.arma = 'metralleta';
-                        jugador.balasMetralleta = 30;
-                        jugador.recargando = false; }
-                    a.activo = false;
-                    armasSuelo.splice(i, 1);
-                    crearParticulas(a.x, a.y, '#FF9100', 20, 5);
-                }
-            }
 
             // Spawn de zombis
             const spawnRate = Math.max(300, 1200 - (minutos * 20));
@@ -1409,26 +1472,31 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
+            // Plataformas
+            for (const p of getPlataformas()) {
+                // Solo dibujar plataformas que no sean el suelo principal
+                if (p.y < H - 50 * s) {
+                    ctx.fillStyle = 'rgba(60,70,90,0.6)';
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 10 * s;
+                    ctx.beginPath();
+                    ctx.roundRect(p.x, p.y, p.w, p.h, 4);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'rgba(100,120,150,0.3)';
+                    ctx.fillRect(p.x + 5 * s, p.y + 2 * s, p.w - 10 * s, 3 * s);
+                }
+            }
+
             // Suelo
             ctx.fillStyle = 'rgba(30,30,50,0.5)';
             ctx.fillRect(0, H - 50 * s, W, 50 * s);
 
-            // Plataformas
-            for (const p of getPlataformas()) {
-                ctx.fillStyle = 'rgba(60,70,90,0.6)';
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 10 * s;
-                ctx.beginPath();
-                ctx.roundRect(p.x, p.y, p.w, p.h, 4);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(100,120,150,0.3)';
-                ctx.fillRect(p.x + 5 * s, p.y + 2 * s, p.w - 10 * s, 3 * s);
-            }
-
             // Elementos
             for (const g of granadasSuelo) {
-                if (!g.activo) continue;
+                if (!g.activo || g.timer <= 0) continue;
+                const alpha = g.timer < 60 ? (g.timer / 60) : 1;
+                ctx.globalAlpha = alpha;
                 ctx.shadowColor = '#FFD700';
                 ctx.shadowBlur = 20 * s;
                 ctx.fillStyle = '#2c3e50';
@@ -1443,6 +1511,7 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('💣', g.x, g.y);
+                ctx.globalAlpha = 1;
             }
 
             for (const c of corazonesSuelo) c.dibujar();
@@ -1539,8 +1608,8 @@
 
             ctx.fillStyle = '#aaa';
             ctx.font = `${13*s}px Arial`;
-            ctx.fillText('🎮 WASD / Flechas: Moverse   |   🖱️ Click: Disparar', W / 2, 150 * s);
-            ctx.fillText('⬆ / W: Saltar (doble salto)   |   G: Lanzar granada', W / 2, 175 * s);
+            ctx.fillText('🎮 WASD / Flechas: Moverse   |   🖱️ Click IZQ: Disparar', W / 2, 150 * s);
+            ctx.fillText('⬆ / W: Saltar (doble salto)   |   🖱️ Click DER: Granada', W / 2, 175 * s);
             ctx.fillText('E / Q: Cambiar arma', W / 2, 200 * s);
 
             ctx.fillStyle = '#FFD700';
@@ -1594,7 +1663,6 @@
             ctx.font = `${10*s}px Arial`;
             ctx.fillText('🐕 Perro policía (Rex) aparece a los 2 minutos', W / 2, H - 30 * s);
 
-            // Detectar clic en botones
             if (juego.menu) {
                 const handler = (e) => {
                     const rect = canvas.getBoundingClientRect();
@@ -1603,6 +1671,7 @@
                         const touch = e.touches[0];
                         x = touch.clientX - rect.left;
                         y = touch.clientY - rect.top;
+                        e.preventDefault();
                     } else {
                         x = e.clientX - rect.left;
                         y = e.clientY - rect.top;
@@ -1681,7 +1750,6 @@
             ctx.font = `bold ${20*s}px Arial`;
             ctx.fillText('🔄 VOLVER A JUGAR', W / 2, btnY + btnH / 2);
 
-            // Detectar clic en botón
             const handler = () => {
                 canvas.removeEventListener('click', handler);
                 canvas.removeEventListener('touchstart', handler);
@@ -1700,10 +1768,7 @@
             teclas[key] = true;
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
             if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && jugador) jugador.saltar();
-            if (e.key === 'g' && jugador) {
-                const g = jugador.lanzarGranada(mouseX, mouseY);
-                if (g) granadas.push(g);
-            }
+            if (e.key === 'g' && jugador) lanzarGranada();
             if ((e.key === 'e' || e.key === 'q') && jugador) jugador.cambiarArma();
         });
 
@@ -1718,13 +1783,20 @@
         });
 
         canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 0) {
+            if (e.button === 0) { // Click izquierdo
                 mousePresionado = true;
                 if (jugador && jugador.vivo && !juego.gameOver && !juego.menu) disparar();
+            } else if (e.button === 2) { // Click derecho
+                e.preventDefault();
+                if (jugador && jugador.vivo && !juego.gameOver && !juego.menu) lanzarGranada();
             }
         });
 
-        canvas.addEventListener('mouseup', () => { mousePresionado = false; });
+        canvas.addEventListener('mouseup', () => {
+            mousePresionado = false;
+        });
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -1753,12 +1825,12 @@
             mousePresionado = false;
         }, { passive: false });
 
-        // Disparo continuo
+        // Disparo continuo con mouse
         setInterval(() => {
             if (mousePresionado && jugador && jugador.vivo && !juego.gameOver && !juego.menu) {
                 disparar();
             }
-        }, 80);
+        }, 100);
 
         // ============================================================
         // POLYFILL
