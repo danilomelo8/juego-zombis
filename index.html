@@ -31,6 +31,7 @@
             touch-action: none;
             width: 100vw;
             height: 100vh;
+            overflow: hidden;
         }
         canvas {
             display: block;
@@ -40,7 +41,6 @@
             height: 100% !important;
         }
         
-        /* Controles móviles */
         #mobileControls {
             position: absolute;
             bottom: 10px;
@@ -159,13 +159,14 @@
             backdrop-filter: blur(4px);
             pointer-events: all;
             font-family: 'Segoe UI', Arial, sans-serif;
+            display: none;
         }
 
         @media (max-width: 768px) {
             #mobileControls { display: flex !important; }
             #joystickZone { display: block !important; }
             #actionButtons { display: flex !important; }
-            #musicToggle { font-size: 12px; padding: 4px 8px; top: 5px; right: 5px; }
+            #musicToggle { display: block !important; font-size: 12px; padding: 4px 8px; top: 5px; right: 5px; }
             #actionButtons button { width: 50px; height: 50px; font-size: 1rem; }
             #actionButtons .btn-shoot { width: 60px; height: 60px; font-size: 1.4rem; }
             #joystickZone { width: 110px; height: 110px; bottom: 15px; left: 15px; }
@@ -221,14 +222,14 @@
         function getPlataformas() {
             const e = ESCALA;
             return [
-                { x: 100*e, y: 450*e, w: 180*e, h: 12*e },
-                { x: 400*e, y: 450*e, w: 180*e, h: 12*e },
-                { x: 700*e, y: 450*e, w: 150*e, h: 12*e },
-                { x: 250*e, y: 340*e, w: 150*e, h: 12*e },
-                { x: 550*e, y: 340*e, w: 150*e, h: 12*e },
-                { x: 100*e, y: 230*e, w: 130*e, h: 12*e },
-                { x: 450*e, y: 230*e, w: 130*e, h: 12*e },
-                { x: 750*e, y: 230*e, w: 120*e, h: 12*e }
+                { x: 80*e, y: 460*e, w: 160*e, h: 12*e },
+                { x: 350*e, y: 460*e, w: 160*e, h: 12*e },
+                { x: 620*e, y: 460*e, w: 160*e, h: 12*e },
+                { x: 200*e, y: 350*e, w: 140*e, h: 12*e },
+                { x: 500*e, y: 350*e, w: 140*e, h: 12*e },
+                { x: 80*e, y: 240*e, w: 120*e, h: 12*e },
+                { x: 380*e, y: 240*e, w: 120*e, h: 12*e },
+                { x: 680*e, y: 240*e, w: 120*e, h: 12*e }
             ];
         }
 
@@ -578,7 +579,6 @@
                 ctx.shadowBlur = 15*e;
                 ctx.shadowOffsetY = 5*e;
 
-                // Cuerpo
                 if (this.genero === 'hombre') {
                     const grad = ctx.createLinearGradient(x, y, x + this.ancho, y);
                     grad.addColorStop(0, '#1a237e');
@@ -645,13 +645,11 @@
 
                 ctx.shadowBlur = 0;
 
-                // Cabeza
                 ctx.fillStyle = C.PIEL;
                 ctx.beginPath();
                 ctx.arc(x + this.ancho / 2, y + 9*e, 12*e, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Pelo
                 if (this.genero === 'hombre') {
                     ctx.fillStyle = '#2c1810';
                     ctx.beginPath();
@@ -665,7 +663,6 @@
                     ctx.fill();
                     ctx.fillRect(x + 5*e, y + 2*e, 20*e, 4*e);
                     
-                    // Anteojos
                     ctx.strokeStyle = '#1a1a1a';
                     ctx.lineWidth = 2*e;
                     ctx.beginPath();
@@ -682,7 +679,6 @@
                     ctx.arc(x + 20*e, y + 8*e, 5*e, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    // Mujer
                     ctx.fillStyle = '#8D6E63';
                     ctx.beginPath();
                     ctx.moveTo(x + 6*e, y + 4*e);
@@ -739,7 +735,6 @@
                     ctx.fill();
                 }
 
-                // Brazos
                 ctx.fillStyle = C.PIEL;
                 const brazoY = y + 18*e;
                 const brazoX = x + (this.mirandoDerecha ? this.ancho : -8*e);
@@ -749,7 +744,6 @@
                 const manoY = brazoY + 12*e;
                 this.dibujarArma(manoX, manoY);
 
-                // Piernas
                 ctx.fillStyle = this.genero === 'hombre' ? '#1a237e' : '#4a148c';
                 const paso = this.animacionFrame * 0.3;
                 const offset1 = Math.sin(paso) * 3*e;
@@ -1021,13 +1015,26 @@
                 this.tiempoAtaque = 0;
                 this.animacionFrame = 0;
                 this.tiempoAnimacion = 0;
-                this.tipo = Math.random() < 0.4 ? 'disparador' : 'normal';
+                this.tipo = 'normal';
                 this.tiempoDisparo = 0;
-                this.puedeDisparar = nivel >= 2 && this.tipo === 'disparador';
+                this.puedeDisparar = false;
             }
 
             get centroX() { return this.x + this.ancho / 2; }
             get centroY() { return this.y + this.alto / 2; }
+
+            configurar(minutos) {
+                // A partir del minuto 2, algunos zombis disparan (alternando)
+                if (minutos >= 2) {
+                    // 30% de probabilidad de que sea disparador, pero alternando
+                    const prob = 0.3 + Math.min(minutos * 0.02, 0.3);
+                    this.tipo = Math.random() < prob ? 'disparador' : 'normal';
+                    this.puedeDisparar = this.tipo === 'disparador';
+                    if (this.puedeDisparar) {
+                        this.velocidad *= 0.8; // Un poco más lento si dispara
+                    }
+                }
+            }
 
             moverHacia(objetivo) {
                 const e = ESCALA;
@@ -1122,7 +1129,7 @@
 
                 ctx.restore();
 
-                if (this.tipo === 'disparador' && this.nivel >= 2) {
+                if (this.tipo === 'disparador') {
                     ctx.fillStyle = 'rgba(255,0,0,0.3)';
                     ctx.font = `${10*e}px Arial`;
                     ctx.textAlign = 'center';
@@ -1458,6 +1465,7 @@
                 this.eliminadosParaCorazon = 0;
                 this.corazonesRecogidos = 0;
                 this.perroActivo = false;
+                this.contadorZombisSpawn = 0;
 
                 this.setupEventListeners();
                 this.buclePrincipal();
@@ -1682,7 +1690,9 @@
                     intentos++;
                 } while (distancia(x, y, this.jugador.centroX, this.jugador.centroY) < 200*e && intentos < 20);
 
-                this.zombis.push(new Zombi(x, y, nivelResistencia));
+                const zombi = new Zombi(x, y, nivelResistencia);
+                zombi.configurar(minutos);
+                return zombi;
             }
 
             actualizar() {
@@ -1696,8 +1706,8 @@
                 this.jugador.mover(this.teclas, this.mouseX, this.mouseY);
                 this.disparoCooldown = Math.max(0, this.disparoCooldown - 1);
 
-                // Spawn del perro en el minuto 3
-                if (minutos >= 3 && !this.perroActivo && !this.perro) {
+                // Spawn del perro en el minuto 2
+                if (minutos >= 2 && !this.perroActivo && !this.perro) {
                     this.perro = new Perro(this.jugador.x - 40*e, this.jugador.y);
                     this.perroActivo = true;
                     crearParticulas(this.perro.centroX, this.perro.centroY, '#FFD700', 30, 5);
@@ -1866,14 +1876,15 @@
                         }
                     }
 
-                    // Disparo de zombis (a partir del minuto 2)
+                    // Disparo de zombis (a partir del minuto 2, solo los de tipo disparador)
                     if (zombi.puedeDisparar && dist < 350*e && dist > 50*e) {
                         zombi.tiempoDisparo++;
-                        if (zombi.tiempoDisparo > 50 + Math.random() * 40) {
+                        if (zombi.tiempoDisparo > 60 + Math.random() * 40) {
                             zombi.tiempoDisparo = 0;
                             const angulo = Math.atan2(this.jugador.centroY - zombi.centroY,
                                                     this.jugador.centroX - zombi.centroX);
                             this.balasEnemigas.push(new Bala(zombi.centroX, zombi.centroY, angulo, 'pistola', true));
+                            crearParticulas(zombi.centroX, zombi.centroY, '#FF6B6B', 5, 2);
                         }
                     }
 
@@ -1942,7 +1953,7 @@
                     this.zombisPorSpawn = 1 + Math.floor(minutos * 0.2);
                     const cantidad = Math.min(this.zombisPorSpawn, 8);
                     for (let i = 0; i < cantidad; i++) {
-                        this.spawnZombi(minutos);
+                        this.zombis.push(this.spawnZombi(minutos));
                     }
                     this.ultimoSpawn = tiempoActual;
                 }
@@ -2301,7 +2312,7 @@
 
                     ctx.fillStyle = 'rgba(255,255,255,0.2)';
                     ctx.font = `${12*e}px Arial`;
-                    ctx.fillText('🐕‍🦺 Perro policía (Rex) aparece a los 3 minutos', ANCHO / 2, ALTO - 40*e);
+                    ctx.fillText('🐕‍🦺 Perro policía (Rex) aparece a los 2 minutos', ANCHO / 2, ALTO - 40*e);
 
                     if (enMenu) {
                         const handler = (e) => {
@@ -2361,7 +2372,7 @@
         resizeCanvas();
         iniciarMusica();
         
-        // Crear el juego pero mostrar el menú primero
+        // Mostrar el menú primero
         juegoActual = new Juego('hombre');
         juegoActual.mostrarMenu();
     </script>
