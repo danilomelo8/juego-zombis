@@ -1024,14 +1024,13 @@
             get centroY() { return this.y + this.alto / 2; }
 
             configurar(minutos) {
-                // A partir del minuto 2, algunos zombis disparan (alternando)
+                // A partir del minuto 2, algunos zombis disparan
                 if (minutos >= 2) {
-                    // 30% de probabilidad de que sea disparador, pero alternando
-                    const prob = 0.3 + Math.min(minutos * 0.02, 0.3);
+                    const prob = Math.min(0.25 + (minutos - 2) * 0.03, 0.45);
                     this.tipo = Math.random() < prob ? 'disparador' : 'normal';
                     this.puedeDisparar = this.tipo === 'disparador';
                     if (this.puedeDisparar) {
-                        this.velocidad *= 0.8; // Un poco más lento si dispara
+                        this.velocidad *= 0.7;
                     }
                 }
             }
@@ -1465,7 +1464,8 @@
                 this.eliminadosParaCorazon = 0;
                 this.corazonesRecogidos = 0;
                 this.perroActivo = false;
-                this.contadorZombisSpawn = 0;
+                this.juegoIniciado = true;
+                this.tiempoUltimoReinicio = Date.now();
 
                 this.setupEventListeners();
                 this.buclePrincipal();
@@ -1876,7 +1876,7 @@
                         }
                     }
 
-                    // Disparo de zombis (a partir del minuto 2, solo los de tipo disparador)
+                    // Disparo de zombis
                     if (zombi.puedeDisparar && dist < 350*e && dist > 50*e) {
                         zombi.tiempoDisparo++;
                         if (zombi.tiempoDisparo > 60 + Math.random() * 40) {
@@ -2372,7 +2372,7 @@
         resizeCanvas();
         iniciarMusica();
         
-        // Mostrar el menú primero
+        // Crear el juego pero mostrar el menú PRIMERO
         juegoActual = new Juego('hombre');
         juegoActual.mostrarMenu();
     </script>
