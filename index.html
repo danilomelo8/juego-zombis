@@ -150,30 +150,36 @@
         }
 
         // ============================================================
-        // PLATAFORMAS (escaladas) - MÁS COMPLETAS
+        // PLATAFORMAS - COMPLETAS (cubren toda la pantalla)
         // ============================================================
         function getPlataformas() {
             const s = S;
             return [
-                // Piso principal
+                // Suelo principal
                 { x: 0, y: H - 50 * s, w: W, h: 10 * s },
-                // Nivel 1 (abajo)
-                { x: 60 * s, y: 460 * s, w: 140 * s, h: 10 * s },
-                { x: 250 * s, y: 460 * s, w: 140 * s, h: 10 * s },
-                { x: 440 * s, y: 460 * s, w: 140 * s, h: 10 * s },
-                { x: 630 * s, y: 460 * s, w: 140 * s, h: 10 * s },
-                // Nivel 2 (medio)
-                { x: 30 * s, y: 350 * s, w: 120 * s, h: 10 * s },
-                { x: 190 * s, y: 350 * s, w: 120 * s, h: 10 * s },
-                { x: 350 * s, y: 350 * s, w: 120 * s, h: 10 * s },
-                { x: 510 * s, y: 350 * s, w: 120 * s, h: 10 * s },
-                { x: 670 * s, y: 350 * s, w: 120 * s, h: 10 * s },
-                // Nivel 3 (arriba)
-                { x: 60 * s, y: 240 * s, w: 100 * s, h: 10 * s },
-                { x: 210 * s, y: 240 * s, w: 100 * s, h: 10 * s },
-                { x: 360 * s, y: 240 * s, w: 100 * s, h: 10 * s },
-                { x: 510 * s, y: 240 * s, w: 100 * s, h: 10 * s },
-                { x: 660 * s, y: 240 * s, w: 100 * s, h: 10 * s }
+                // NIVEL 1 (abajo) - 6 plataformas
+                { x: 20 * s, y: 460 * s, w: 110 * s, h: 10 * s },
+                { x: 160 * s, y: 460 * s, w: 110 * s, h: 10 * s },
+                { x: 300 * s, y: 460 * s, w: 110 * s, h: 10 * s },
+                { x: 440 * s, y: 460 * s, w: 110 * s, h: 10 * s },
+                { x: 580 * s, y: 460 * s, w: 110 * s, h: 10 * s },
+                { x: 720 * s, y: 460 * s, w: 110 * s, h: 10 * s },
+                // NIVEL 2 (medio) - 7 plataformas
+                { x: 10 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                { x: 140 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                { x: 270 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                { x: 400 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                { x: 530 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                { x: 660 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                { x: 790 * s, y: 350 * s, w: 100 * s, h: 10 * s },
+                // NIVEL 3 (arriba) - 7 plataformas
+                { x: 30 * s, y: 240 * s, w: 90 * s, h: 10 * s },
+                { x: 150 * s, y: 240 * s, w: 90 * s, h: 10 * s },
+                { x: 270 * s, y: 240 * s, w: 90 * s, h: 10 * s },
+                { x: 390 * s, y: 240 * s, w: 90 * s, h: 10 * s },
+                { x: 510 * s, y: 240 * s, w: 90 * s, h: 10 * s },
+                { x: 630 * s, y: 240 * s, w: 90 * s, h: 10 * s },
+                { x: 750 * s, y: 240 * s, w: 90 * s, h: 10 * s }
             ];
         }
 
@@ -317,8 +323,7 @@
                     }
                 }
 
-                // Si cae al vacío, reaparece en el piso principal
-                if (this.y > H) {
+                if (this.y > H + 100) {
                     this.y = H - 100 * s;
                     this.vy = 0;
                     this.vidas--;
@@ -530,17 +535,23 @@
 
                 ctx.restore();
 
-                // Corazones
+                // CORAZONES - AHORA SE APAGAN CORRECTAMENTE
                 for (let i = 0; i < this.maxVidas; i++) {
-                    ctx.font = `${18*s}px Arial`;
+                    ctx.font = `${20*s}px Arial`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    const cx2 = x + i * 20 * s;
-                    const cy2 = y - 25 * s;
-                    ctx.fillStyle = i < this.vidas ? '#ff1744' : '#333';
-                    ctx.shadowColor = i < this.vidas ? '#ff1744' : 'transparent';
-                    ctx.shadowBlur = i < this.vidas ? 10 * s : 0;
-                    ctx.fillText('❤️', cx2 + 8 * s, cy2 + 10 * s);
+                    const cx2 = x - 10 * s + i * 22 * s;
+                    const cy2 = y - 28 * s;
+                    if (i < this.vidas) {
+                        ctx.fillStyle = '#ff1744';
+                        ctx.shadowColor = '#ff1744';
+                        ctx.shadowBlur = 15 * s;
+                        ctx.fillText('❤️', cx2 + 10 * s, cy2 + 10 * s);
+                    } else {
+                        ctx.fillStyle = '#333';
+                        ctx.shadowBlur = 0;
+                        ctx.fillText('🖤', cx2 + 10 * s, cy2 + 10 * s);
+                    }
                 }
                 ctx.shadowBlur = 0;
                 ctx.globalAlpha = 1;
@@ -1029,7 +1040,7 @@
                 this.tipo = tipo;
                 this.radio = 14 * s;
                 this.activo = true;
-                this.timer = 600; // 10 segundos
+                this.timer = 600;
                 this.flotando = 0;
                 this.tiempo = 0;
             }
@@ -1050,7 +1061,6 @@
                 this.tiempo++;
                 this.flotando = Math.sin(this.tiempo * 0.05) * 4 * s;
 
-                // Parpadeo cuando está por desaparecer
                 if (this.timer < 60 && Math.floor(this.timer / 6) % 2 === 0) {
                     ctx.globalAlpha = 0.4;
                 }
@@ -1093,7 +1103,7 @@
                 this.y = y;
                 this.radio = 15 * s;
                 this.activo = true;
-                this.timer = 600; // 10 segundos
+                this.timer = 600;
                 this.flotando = 0;
                 this.tiempo = 0;
             }
@@ -1288,7 +1298,7 @@
                 }
             }
 
-            // Recoger corazones (con temporizador)
+            // Recoger corazones
             for (let i = corazonesSuelo.length - 1; i >= 0; i--) {
                 const c = corazonesSuelo[i];
                 c.timer--;
@@ -1304,7 +1314,7 @@
                 }
             }
 
-            // Armas en suelo (con temporizador)
+            // Armas en suelo
             for (let i = armasSuelo.length - 1; i >= 0; i--) {
                 const a = armasSuelo[i];
                 a.timer--;
@@ -1321,7 +1331,7 @@
                 }
             }
 
-            // Balas del jugador - DAÑO A ZOMBIS
+            // Balas del jugador
             for (let i = balas.length - 1; i >= 0; i--) {
                 const b = balas[i];
                 b.mover();
@@ -1332,7 +1342,6 @@
                 let balaUsada = false;
                 for (const z of zombis) {
                     if (!z.vivo) continue;
-                    // Colisión con el zombi (cuerpo completo, no solo cabeza)
                     if (b.x > z.x && b.x < z.x + z.w && b.y > z.y && b.y < z.y + z.h) {
                         if (z.recibirDaño(b.daño)) {
                             juego.puntuacion += 5 + Math.floor(minutos * 0.5);
@@ -1360,7 +1369,7 @@
                 if (balaUsada) continue;
             }
 
-            // Balas enemigas - DAÑO AL JUGADOR
+            // Balas enemigas
             for (let i = balasEnemigas.length - 1; i >= 0; i--) {
                 const b = balasEnemigas[i];
                 b.mover();
@@ -1369,7 +1378,6 @@
                     continue;
                 }
                 if (jugador.vivo) {
-                    // Colisión con el jugador (cuerpo completo)
                     if (b.x > jugador.x && b.x < jugador.x + jugador.w &&
                         b.y > jugador.y && b.y < jugador.y + jugador.h) {
                         jugador.recibirDaño();
@@ -1416,12 +1424,11 @@
                 }
             }
 
-            // Zombis - DAÑO AL JUGADOR POR CONTACTO
+            // Zombis
             for (const z of zombis) {
                 if (!z.vivo) continue;
                 z.mover(jugador);
 
-                // Colisión con el jugador (cuerpo completo)
                 if (z.x < jugador.x + jugador.w && z.x + z.w > jugador.x &&
                     z.y < jugador.y + jugador.h && z.y + z.h > jugador.y) {
                     if (z.tiempoAtaque <= 0 && jugador.tiempoAtaque <= 0) {
@@ -1474,7 +1481,6 @@
 
             // Plataformas
             for (const p of getPlataformas()) {
-                // Solo dibujar plataformas que no sean el suelo principal
                 if (p.y < H - 50 * s) {
                     ctx.fillStyle = 'rgba(60,70,90,0.6)';
                     ctx.shadowColor = 'rgba(0,0,0,0.3)';
@@ -1783,10 +1789,10 @@
         });
 
         canvas.addEventListener('mousedown', (e) => {
-            if (e.button === 0) { // Click izquierdo
+            if (e.button === 0) {
                 mousePresionado = true;
                 if (jugador && jugador.vivo && !juego.gameOver && !juego.menu) disparar();
-            } else if (e.button === 2) { // Click derecho
+            } else if (e.button === 2) {
                 e.preventDefault();
                 if (jugador && jugador.vivo && !juego.gameOver && !juego.menu) lanzarGranada();
             }
@@ -1825,7 +1831,7 @@
             mousePresionado = false;
         }, { passive: false });
 
-        // Disparo continuo con mouse
+        // Disparo continuo
         setInterval(() => {
             if (mousePresionado && jugador && jugador.vivo && !juego.gameOver && !juego.menu) {
                 disparar();
